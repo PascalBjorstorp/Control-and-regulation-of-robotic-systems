@@ -1,0 +1,5 @@
+/home/aksel/Desktop/Code/simu/build/CMakeFiles/BallMazeGame.dir
+/home/aksel/Desktop/Code/simu/build/CMakeFiles/package.dir
+/home/aksel/Desktop/Code/simu/build/CMakeFiles/package_source.dir
+/home/aksel/Desktop/Code/simu/build/CMakeFiles/edit_cache.dir
+/home/aksel/Desktop/Code/simu/build/CMakeFiles/rebuild_cache.dir
