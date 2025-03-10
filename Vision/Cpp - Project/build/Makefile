@@ -503,6 +503,30 @@ ContinuousSubmit/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ContinuousSubmit.dir/build.make CMakeFiles/ContinuousSubmit.dir/build
 .PHONY : ContinuousSubmit/fast
 
+SS_detect.o: SS_detect.cpp.o
+.PHONY : SS_detect.o
+
+# target to build an object file
+SS_detect.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/vision.dir/build.make CMakeFiles/vision.dir/SS_detect.cpp.o
+.PHONY : SS_detect.cpp.o
+
+SS_detect.i: SS_detect.cpp.i
+.PHONY : SS_detect.i
+
+# target to preprocess a source file
+SS_detect.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/vision.dir/build.make CMakeFiles/vision.dir/SS_detect.cpp.i
+.PHONY : SS_detect.cpp.i
+
+SS_detect.s: SS_detect.cpp.s
+.PHONY : SS_detect.s
+
+# target to generate assembly for a file
+SS_detect.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/vision.dir/build.make CMakeFiles/vision.dir/SS_detect.cpp.s
+.PHONY : SS_detect.cpp.s
+
 functions.o: functions.cpp.o
 .PHONY : functions.o
 
@@ -527,6 +551,30 @@ functions.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/vision.dir/build.make CMakeFiles/vision.dir/functions.cpp.s
 .PHONY : functions.cpp.s
 
+line_detection.o: line_detection.cpp.o
+.PHONY : line_detection.o
+
+# target to build an object file
+line_detection.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/vision.dir/build.make CMakeFiles/vision.dir/line_detection.cpp.o
+.PHONY : line_detection.cpp.o
+
+line_detection.i: line_detection.cpp.i
+.PHONY : line_detection.i
+
+# target to preprocess a source file
+line_detection.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/vision.dir/build.make CMakeFiles/vision.dir/line_detection.cpp.i
+.PHONY : line_detection.cpp.i
+
+line_detection.s: line_detection.cpp.s
+.PHONY : line_detection.s
+
+# target to generate assembly for a file
+line_detection.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/vision.dir/build.make CMakeFiles/vision.dir/line_detection.cpp.s
+.PHONY : line_detection.cpp.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -550,6 +598,30 @@ main.s: main.cpp.s
 main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/vision.dir/build.make CMakeFiles/vision.dir/main.cpp.s
 .PHONY : main.cpp.s
+
+morph_funcs.o: morph_funcs.cpp.o
+.PHONY : morph_funcs.o
+
+# target to build an object file
+morph_funcs.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/vision.dir/build.make CMakeFiles/vision.dir/morph_funcs.cpp.o
+.PHONY : morph_funcs.cpp.o
+
+morph_funcs.i: morph_funcs.cpp.i
+.PHONY : morph_funcs.i
+
+# target to preprocess a source file
+morph_funcs.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/vision.dir/build.make CMakeFiles/vision.dir/morph_funcs.cpp.i
+.PHONY : morph_funcs.cpp.i
+
+morph_funcs.s: morph_funcs.cpp.s
+.PHONY : morph_funcs.s
+
+# target to generate assembly for a file
+morph_funcs.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/vision.dir/build.make CMakeFiles/vision.dir/morph_funcs.cpp.s
+.PHONY : morph_funcs.cpp.s
 
 # Help Target
 help:
@@ -589,12 +661,21 @@ help:
 	@echo "... NightlyTest"
 	@echo "... NightlyUpdate"
 	@echo "... vision"
+	@echo "... SS_detect.o"
+	@echo "... SS_detect.i"
+	@echo "... SS_detect.s"
 	@echo "... functions.o"
 	@echo "... functions.i"
 	@echo "... functions.s"
+	@echo "... line_detection.o"
+	@echo "... line_detection.i"
+	@echo "... line_detection.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... morph_funcs.o"
+	@echo "... morph_funcs.i"
+	@echo "... morph_funcs.s"
 .PHONY : help
 
 

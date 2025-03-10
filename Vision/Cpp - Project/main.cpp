@@ -8,6 +8,9 @@
 #include "opencv2/imgproc.hpp"
 
 #include "functions.h"
+#include "SS_detect.h"
+#include "morph_funcs.h"
+#include "line_detection.h"
 
 using namespace std;
 using namespace cv;
@@ -51,12 +54,16 @@ using namespace cv;
     such that waypoints/commands come in correct sequence.
         - Might need to project the lines to be longer, to fill gaps from eliminated lines,
         in order to sort the lines in chronological order.
+    
+    - While having end points in red and green, it is important to notice that red is within the 
+    threshold values (currently used), and it can therefore be detected by houghlineP, which is 
+    not ideal. We will therefore record the position of the start/stop points, and color them white
+    afterwards.
 */
 
 int main(int argc, char** argv) 
 { 
-    Mat img = imread("/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/test_img.jpg", IMREAD_GRAYSCALE); 
-    Mat test_image = Mat::zeros(10, 10, CV_8UC1);
+    Mat img = imread("/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/test_img_ended.jpg", IMREAD_COLOR); 
 
     //Check if image was read properly.
     if (img.empty()) { 
@@ -67,141 +74,74 @@ int main(int argc, char** argv)
     } 
 
     //Display image after being read
-    //namedWindow("Window1", WINDOW_GUI_NORMAL);
-    //imshow("Window1", img);
+    namedWindow("Window1", WINDOW_GUI_NORMAL);
+    imshow("Window1", img);
 
-    threshold(img, img, 145, 255, THRESH_BINARY_INV);
+    // Initialize Mat types for making masks for blue and red - To find start and stop points
+    Mat blue_img, red_img;
 
-    //Display threshold output image
-    //namedWindow("threshold", WINDOW_NORMAL);
-    //imshow("threshold", img);
+    // Read mask for red and blue colors into Mat type
+    red_img = isolate_red(img);
 
-    //Declare variables with correct color channels - 8 bit 1 color
-    Mat skel(Mat::zeros(img.size(), CV_8UC1)), temp(Mat::zeros(img.size(), CV_8UC1)), eroded(Mat::zeros(img.size(), CV_8UC1));
+    blue_img = isolate_blue(img);
 
-    //Declare element - Matrix used for certain functions
-    Mat element = getStructuringElement(MORPH_CROSS, Size(3,3));
+    // Use hough circles algorithm to find coordinates for start and end points - save in SS_points
+    std::vector<Vec3f> SS_points;
+    detect_SS(blue_img, SS_points);
+    detect_SS(red_img, SS_points);
 
-    //Perform skeletonization of image
-    do{
-        erode(img, eroded, element);
-        dilate(eroded, temp, element);
-        subtract(img, temp, temp);
-        bitwise_or(skel, temp, skel);
-        eroded.copyTo(img);
-    
-    }while(countNonZero(img) != 0);
+    // Remove the start and stop identifiers from image (white out)
+    rmv_SS(img, SS_points);
 
-    //Show skeleton image output
-    //namedWindow("Skeleton", WINDOW_GUI_NORMAL);
-    //imshow("Skeleton", skel);
+    // Transform img to gray scale, changes amount of color channels for the Mat type
+    cvtColor(img, img, cv::COLOR_BGR2GRAY);
 
-    //Copy skeleton line image (output), to img - Better for my brain 
-    skel.copyTo(img);
+    // Perform skeletonization on the image
+    img = perform_skeletonization(img);
 
-    //Dilate image to limit the amount of line fractions
-    morphologyEx(img, img, MORPH_DILATE, element);
-
-    //Show dilated for referecing
-    //namedWindow("dilate", WINDOW_GUI_NORMAL);
-    //imshow("dilate", img);
+    // Dilate the image afterwards - Reduces the amount of fragmented segments in the skeleton
+    perform_dilate(img);
 
     //Declare Mat values for output showing - Use cvt to make correct amount of channels.
-    Mat output, test_output;
+    Mat output;
     cvtColor(img, output, COLOR_GRAY2BGR);
-    cvtColor(img, test_output, COLOR_GRAY2BGR);
 
-    // Probabilistic Hough Line Transform
-    vector<Vec4i> lines, test_lines; // will hold the results of the detection
-    HoughLinesP(img, lines, 1, CV_PI/180, 50, 50, 10 ); // runs the actual detection
+    // Initialize vector which will hold "lines" - coordinates for start and end points.
+    std::vector<Vec4i> lines;
 
-    // To show what it looks like without limiting line length
-    HoughLinesP(img, test_lines, 1, CV_PI/180, 50, 50, 10 );
+    // Detect the lines in img
+    lines = detect_lines(img);
 
-    eliminate_small_lines(lines, 180); 
-    
-    // Draw the lines
-    for( size_t i = 0; i < lines.size(); i++ )
-    {
-        Vec4i l = lines[i];
-        line( output, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, LINE_AA);
+    // Sort the detected lines
+    lines = sort(img, lines, SS_points);
+
+    // Draw the found lines
+    for(size_t i = 0; i < lines.size(); i++){
+        line(output, Point(lines[i][0], lines[i][1]), Point(lines[i][2], lines[i][3]), Scalar(0,0,255), 3, LINE_AA);
     }
 
-    for( size_t i = 0; i < test_lines.size(); i++ )
-    {
-        Vec4i l = test_lines[i];
-        line( test_output, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, LINE_AA);
+    namedWindow("first", WINDOW_NORMAL);
+    imshow("first", output);
+
+    std::vector<Point> inters = find_inters(lines);
+
+    for(size_t i = 0; i < inters.size(); i++){
+        if(inters[i] == Point(-1,-1)){
+            continue;
+        }
+        else{
+            circle(output, inters[i], 30, Scalar(255,0,0), -1);
+        }
     }
 
-    /*namedWindow("Lines - Limited", WINDOW_NORMAL);
-    imshow("Lines - Limited", output);*/
+    std::vector<Vec4i> comp_path = handle_inters(lines, inters);
 
-    namedWindow("Lines - not limited", WINDOW_NORMAL);
-    imshow("Lines - not limited", test_output);
-
-    namedWindow("Lines - Limited", WINDOW_NORMAL);
-    imshow("Lines - Limited", output);
-    
-    //testing to see if lines appear in sorted order - They do not
-    /*for(int i = 0; i < lines.size(); i++){
-
-        Point temp(lines[i][2], lines[i][3]);
-        circle(output, temp, 50, Scalar(0,0,255), -1);
-        
-        namedWindow("Highlight end point", WINDOW_NORMAL);
-        imshow("Highlight end point", output);
-        waitKey(0);
-    }*/
-
-    /*int starting_pnt;
-
-    starting_pnt = find_start(lines);
-
-    circle(output, Point(lines[starting_pnt][0], lines[starting_pnt][1]), 50, Scalar(255,0,0), -1);
-    circle(output, Point(lines[starting_pnt][2], lines[starting_pnt][3]), 50, Scalar(255,0,0), -1);*/
-
-    /*bezier_curve(output, lines, 10, 100);
-
-    namedWindow("Bezier", WINDOW_NORMAL);
-    imshow("Bezier", output);*/
-
-    vector<Point> inters;
-
-    inters = find_all_inters(lines);
-
-    for(int i = 0; i < inters.size(); i++){
-        circle(output, inters[i], 50, Scalar(255,0,0), -1);
+    for(size_t i = 0; i < comp_path.size(); i++){
+        line(output, Point(comp_path[i][0], comp_path[i][1]), Point(comp_path[i][2], comp_path[i][3]), Scalar(0,0,255), 3, LINE_AA);
     }
 
-    namedWindow("Inters", WINDOW_NORMAL);
-    imshow("Inters", output);
-
-    Mat image;
-    cvtColor(test_image, image, COLOR_GRAY2BGR);
-
-    vector<Vec4i> int_test;
-
-    int_test.push_back(Vec4i(3,5,7,5));
-    int_test.push_back(Vec4i(6,1,6,6));
-
-    for(int i = 0; i < int_test.size(); i++){
-        line(image, Point(int_test[i][0], int_test[i][1]), Point(int_test[i][2],int_test[i][3]), Scalar(0,0,255), 1);
-    }
-
-    namedWindow("int - test", WINDOW_NORMAL);
-    imshow("int - test", image);
-
-    inters = find_all_inters(int_test);
-
-    for(int i = 0; i < inters.size(); i++){
-        std::cout << "int point: " << inters[i] << std::endl;
-        circle(image, inters[i], 1, Scalar(128,0,128), -1);
-    }
-
-    namedWindow("int - test - int", WINDOW_NORMAL);
-    imshow("int - test - int", image);
-
-    //std::cout << "inters: " << inters << std::endl;
+    namedWindow("first", WINDOW_NORMAL);
+    imshow("first", output);
 
     waitKey(0);
     destroyAllWindows();

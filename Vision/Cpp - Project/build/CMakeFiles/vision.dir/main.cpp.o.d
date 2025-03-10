@@ -365,4 +365,7 @@ CMakeFiles/vision.dir/main.cpp.o: \
  /usr/local/include/opencv4/opencv2/video/background_segm.hpp \
  /home/mads-hyrup/Documents/Uni/4.Semester/Cpp\ -\ Project/functions.h \
  /usr/include/X11/Xlib.h /usr/include/X11/X.h \
- /usr/include/X11/Xfuncproto.h /usr/include/X11/Xosdefs.h
+ /usr/include/X11/Xfuncproto.h /usr/include/X11/Xosdefs.h \
+ /home/mads-hyrup/Documents/Uni/4.Semester/Cpp\ -\ Project/SS_detect.h \
+ /home/mads-hyrup/Documents/Uni/4.Semester/Cpp\ -\ Project/morph_funcs.h \
+ /home/mads-hyrup/Documents/Uni/4.Semester/Cpp\ -\ Project/line_detection.h

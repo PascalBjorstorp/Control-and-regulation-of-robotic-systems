@@ -97,16 +97,64 @@ CMakeFiles/vision.dir/functions.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/vision.dir/functions.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/functions.cpp" -o CMakeFiles/vision.dir/functions.cpp.s
 
+CMakeFiles/vision.dir/SS_detect.cpp.o: CMakeFiles/vision.dir/flags.make
+CMakeFiles/vision.dir/SS_detect.cpp.o: /home/mads-hyrup/Documents/Uni/4.Semester/Cpp\ -\ Project/SS_detect.cpp
+CMakeFiles/vision.dir/SS_detect.cpp.o: CMakeFiles/vision.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/vision.dir/SS_detect.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/vision.dir/SS_detect.cpp.o -MF CMakeFiles/vision.dir/SS_detect.cpp.o.d -o CMakeFiles/vision.dir/SS_detect.cpp.o -c "/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/SS_detect.cpp"
+
+CMakeFiles/vision.dir/SS_detect.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/vision.dir/SS_detect.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/SS_detect.cpp" > CMakeFiles/vision.dir/SS_detect.cpp.i
+
+CMakeFiles/vision.dir/SS_detect.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/vision.dir/SS_detect.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/SS_detect.cpp" -o CMakeFiles/vision.dir/SS_detect.cpp.s
+
+CMakeFiles/vision.dir/morph_funcs.cpp.o: CMakeFiles/vision.dir/flags.make
+CMakeFiles/vision.dir/morph_funcs.cpp.o: /home/mads-hyrup/Documents/Uni/4.Semester/Cpp\ -\ Project/morph_funcs.cpp
+CMakeFiles/vision.dir/morph_funcs.cpp.o: CMakeFiles/vision.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/vision.dir/morph_funcs.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/vision.dir/morph_funcs.cpp.o -MF CMakeFiles/vision.dir/morph_funcs.cpp.o.d -o CMakeFiles/vision.dir/morph_funcs.cpp.o -c "/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/morph_funcs.cpp"
+
+CMakeFiles/vision.dir/morph_funcs.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/vision.dir/morph_funcs.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/morph_funcs.cpp" > CMakeFiles/vision.dir/morph_funcs.cpp.i
+
+CMakeFiles/vision.dir/morph_funcs.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/vision.dir/morph_funcs.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/morph_funcs.cpp" -o CMakeFiles/vision.dir/morph_funcs.cpp.s
+
+CMakeFiles/vision.dir/line_detection.cpp.o: CMakeFiles/vision.dir/flags.make
+CMakeFiles/vision.dir/line_detection.cpp.o: /home/mads-hyrup/Documents/Uni/4.Semester/Cpp\ -\ Project/line_detection.cpp
+CMakeFiles/vision.dir/line_detection.cpp.o: CMakeFiles/vision.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/vision.dir/line_detection.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/vision.dir/line_detection.cpp.o -MF CMakeFiles/vision.dir/line_detection.cpp.o.d -o CMakeFiles/vision.dir/line_detection.cpp.o -c "/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/line_detection.cpp"
+
+CMakeFiles/vision.dir/line_detection.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/vision.dir/line_detection.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/line_detection.cpp" > CMakeFiles/vision.dir/line_detection.cpp.i
+
+CMakeFiles/vision.dir/line_detection.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/vision.dir/line_detection.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/line_detection.cpp" -o CMakeFiles/vision.dir/line_detection.cpp.s
+
 # Object files for target vision
 vision_OBJECTS = \
 "CMakeFiles/vision.dir/main.cpp.o" \
-"CMakeFiles/vision.dir/functions.cpp.o"
+"CMakeFiles/vision.dir/functions.cpp.o" \
+"CMakeFiles/vision.dir/SS_detect.cpp.o" \
+"CMakeFiles/vision.dir/morph_funcs.cpp.o" \
+"CMakeFiles/vision.dir/line_detection.cpp.o"
 
 # External object files for target vision
 vision_EXTERNAL_OBJECTS =
 
 vision: CMakeFiles/vision.dir/main.cpp.o
 vision: CMakeFiles/vision.dir/functions.cpp.o
+vision: CMakeFiles/vision.dir/SS_detect.cpp.o
+vision: CMakeFiles/vision.dir/morph_funcs.cpp.o
+vision: CMakeFiles/vision.dir/line_detection.cpp.o
 vision: CMakeFiles/vision.dir/build.make
 vision: /usr/local/lib/libopencv_gapi.so.4.9.0
 vision: /usr/local/lib/libopencv_highgui.so.4.9.0
@@ -128,7 +176,7 @@ vision: /usr/local/lib/libopencv_flann.so.4.9.0
 vision: /usr/local/lib/libopencv_imgproc.so.4.9.0
 vision: /usr/local/lib/libopencv_core.so.4.9.0
 vision: CMakeFiles/vision.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable vision"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable vision"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/vision.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
