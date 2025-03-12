@@ -2,7 +2,6 @@
 #define LINEDETECTER_H
 
 #include "imagehandler.h"
-#include <iostream>
 #include <vector>
 
 #include <opencv2/opencv.hpp>
@@ -36,6 +35,12 @@ public:
     void eliminate_overlap();
 
     void detect_lines();
+
+    cv::Vec4i find_closest_pair(const cv::Vec4i line1, const cv::Vec4i line2);
+
+    void conn_lines();
+
+    void flip();
 
     void sort();
 

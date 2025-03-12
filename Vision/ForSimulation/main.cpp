@@ -1,13 +1,7 @@
 #include <iostream>
-#include <vector>
 #include <cmath>
 
-#include "imagehandler.h"
 #include "linedetecter.h"
-#include "opencv2/opencv.hpp"
-#include "opencv2/imgcodecs.hpp"
-#include "opencv2/highgui.hpp"
-#include "opencv2/imgproc.hpp"
 
 //#include "functions.h"
 

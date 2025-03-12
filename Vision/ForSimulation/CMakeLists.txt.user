@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 15.0.1, 2025-03-12T13:10:35. -->
+<!-- Written by QtCreator 15.0.1, 2025-03-12T13:19:41. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -449,6 +449,7 @@
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/Cpp - Project/build/Desktop_Qt_6_6_1_GCC_64bit-Debug</value>
    </valuemap>
    <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>

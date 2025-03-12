@@ -8,7 +8,7 @@
 
 class imageHandler
 {
-    cv::Mat _img, _red_img, _blue_img, _green_img, output;
+    cv::Mat _img, _red_img, _blue_img, _green_img;
     std::vector<cv::Vec3f> _SS_points;
 
 public:

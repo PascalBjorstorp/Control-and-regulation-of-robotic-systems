@@ -2,16 +2,15 @@
 
 imageHandler::imageHandler(cv::Mat img):_img(img)
 {
-    isolate_red();
+    isolate_green();
     isolate_blue();
-    detect_SS(&_blue_img);
+    isolate_red();
+    detect_SS(&_green_img);
     detect_SS(&_red_img);
     rmv_SS();
     cvtColor(_img, _img, cv::COLOR_BGR2GRAY);
     perform_skeletonization();
     perform_dilate();
-    cvtColor(_img, output, cv::COLOR_GRAY2BGR);
-
 }
 
 void imageHandler::isolate_red(){
