@@ -33,6 +33,14 @@ void imageHandler::isolate_blue(){
     cv::inRange(hsv, cv::Scalar(100, 150, 50), cv::Scalar(140, 255, 255), _blue_img);
 }
 
+void imageHandler::isolate_green(){
+    cv::Mat hsv;
+
+    cvtColor(_img, hsv, cv::COLOR_BGR2HSV);
+
+    inRange(hsv, cv::Scalar(35, 100, 50), cv::Scalar(85, 255, 255), _green_img);
+}
+
 void imageHandler::detect_SS(cv::Mat *img){
     cv::Mat temp;
     cv::Vec3f fin_circ;

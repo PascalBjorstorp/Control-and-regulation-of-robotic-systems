@@ -1,4 +1,4 @@
-#include "../../../../../Desktop/Code/simu/linedetecter.h"
+#include "linedetecter.h"
 
 lineDetecter::lineDetecter(cv::Mat img): imageHandler(img){
     _img = get_img();
