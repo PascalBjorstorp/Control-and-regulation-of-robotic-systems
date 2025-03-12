@@ -14,6 +14,8 @@ Mat isolate_red(const Mat img);
 
 Mat isolate_blue(const Mat img);
 
+Mat isolate_green(const Mat img);
+
 void detect_SS(const Mat img, std::vector<Vec3f>& SS_points);
 
 void rmv_SS(Mat& img, const std::vector<Vec3f> SS_points);

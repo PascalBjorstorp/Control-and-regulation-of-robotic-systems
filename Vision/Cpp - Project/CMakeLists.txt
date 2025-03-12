@@ -5,8 +5,7 @@ find_package(OpenCV 4.0.0 REQUIRED)
 find_package(X11 REQUIRED)
 
 add_executable(vision 
-    main.cpp 
-    functions.h functions.cpp
+    main.cpp
     SS_detect.h SS_detect.cpp
     morph_funcs.h morph_funcs.cpp
     line_detection.h line_detection.cpp
