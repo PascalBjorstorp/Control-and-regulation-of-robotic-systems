@@ -219,8 +219,6 @@ std::vector<Vec4i> conn_lines(const std::vector<Vec4i> lines, const std::vector<
     Point start_pnt(SS_points[0][0], SS_points[0][1]);
     Point end_pnt(SS_points[1][0], SS_points[1][1]);
 
-    std::cout << "size: " << lines.size() << std::endl;
-
     for(size_t i = 0; i < lines.size(); i++){
 
         Point line_pnt1(lines[i][0], lines[i][1]);
@@ -238,7 +236,6 @@ std::vector<Vec4i> conn_lines(const std::vector<Vec4i> lines, const std::vector<
             }
         }
         else if(i == lines.size()-1){
-
             if(calc_dist(line_pnt1, end_pnt) < calc_dist(line_pnt2, end_pnt)){
                 temp_lines[i][0] = end_pnt.x;
                 temp_lines[i][1] = end_pnt.y;
@@ -250,8 +247,6 @@ std::vector<Vec4i> conn_lines(const std::vector<Vec4i> lines, const std::vector<
         }
         
         if(!corner_between(lines[i], lines[i+1], 15)){
-
-            std::cout << "found no corner between, i: " << i << std::endl;
             
             clos_points = find_closest_pair(lines[i], lines[i+1]);
 
@@ -273,70 +268,6 @@ std::vector<Vec4i> flip(const std::vector<Vec4i> lines, const std::vector<Vec3f>
     float dist1, dist2;
 
     for(size_t i = 0; i < lines.size(); i++){
-
-        /*if(i == 0){
-
-            Point line_pnt1(lines[i][0], lines[i][1]);
-            Point line_pnt2(lines[i][2], lines[i][3]);
-
-            Point start_pnt(SS_points[0][0], SS_points[0][1]);
-
-            if(calc_dist(line_pnt1, start_pnt) < calc_dist(line_pnt2, start_pnt)){
-                temp_lines[i][0] = start_pnt.x;
-                temp_lines[i][1] = start_pnt.y;
-            }
-            else{
-                temp.x = temp_lines[i][0];
-                temp.y = temp_lines[i][1];
-
-                temp_lines[i][0] = start_pnt.x;
-                temp_lines[i][1] = start_pnt.y;
-
-                temp_lines[i][2] = temp.x;
-                temp_lines[i][3] = temp.y;
-            }
-        }
-        /*else if(i == lines.size()-2){
-
-            Point line_pnt1(lines[i][0], lines[i][1]);
-            Point line_pnt2(lines[i][2], lines[i][3]);
-
-            Point end_pnt(SS_points[1][0], SS_points[1][1]);
-
-            if(calc_dist(line_pnt1, end_pnt) < calc_dist(line_pnt2, end_pnt)){
-                temp.x = temp_lines[i][2];
-                temp.y = temp_lines[i][3];
-
-                temp_lines[i][2] = end_pnt.x;
-                temp_lines[i][3] = end_pnt.y;
-
-                temp_lines[i][0] = temp.x;
-                temp_lines[i][1] = temp.y;
-            }
-            else{
-                temp_lines[i][2] = end_pnt.x;
-                temp_lines[i][3] = end_pnt.y;
-            }
-        }
-        else{
-
-            dist1 = calc_dist(Point(lines[i][0], lines[i][1]), Point(lines[i - 1][2], lines[i - 1][3]));
-            dist2 = calc_dist(Point(lines[i][2], lines[i][3]), Point(lines[i - 1][2], lines[i - 1][3]));
-
-            if(dist1 < dist2){
-                continue;
-            }
-            else{
-                temp.x = lines[i][0];
-                temp.y = lines[i][1];
-
-                temp_lines[i][0] = lines[i][2];
-                temp_lines[i][1] = lines[i][3];
-
-                temp_lines[i][2] = temp.x;
-                temp_lines[i][3] = temp.y;
-            }
-        }*/
 
         dist1 = calc_dist(Point(lines[i][0], lines[i][1]), Point(lines[i - 1][2], lines[i - 1][3]));
             dist2 = calc_dist(Point(lines[i][2], lines[i][3]), Point(lines[i - 1][2], lines[i - 1][3]));
@@ -404,7 +335,9 @@ int calc_angle(const Vec4i line1, const Vec4i line2){
 }
 
 bool corner_between(const Vec4i line1, const Vec4i line2, const int angle_limit){
-    if(calc_angle(line1, line2) > angle_limit){
+    float angle = calc_angle(line1, line2);
+
+    if((angle > angle_limit) && (angle < 180 - angle_limit)){
         return true;
     }
     
@@ -459,7 +392,9 @@ std::vector<Point> find_inters(const std::vector<Vec4i> lines){
     std::vector<Vec4i> ext_lines = lines;
 
     for(size_t i = 0; i < lines.size()-1; i++){
+
         if(corner_between(lines[i], lines[i+1], 15)){
+
             ext_lines[i] = extend_line(lines[i], 1.2);
             ext_lines[i+1] = extend_line(lines[i+1], 1.2);
             inter = calc_inter(lines[i], lines[i+1]);
