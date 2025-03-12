@@ -46,6 +46,8 @@ void Updater::update(){
         std::stringstream ss;
         ss << "X Tilt: " << std::fixed << std::setprecision(1) << _maze.getTiltX()
            << "\nY Tilt: " << std::fixed << std::setprecision(1) << _maze.getTiltY()
+           << "\nX Motor Speed: " << std::fixed << std::setprecision(1) << _maze.getMotorXSpeed() 
+           << "\nY Motor Speed: " << std::fixed << std::setprecision(1) << _maze.getMotorYSpeed()
            << "\nVelocity x: " << std::fixed << std::setprecision(1) << _ball.getVelocity().x
            << "\nVelocity y: " << std::fixed << std::setprecision(1) << _ball.getVelocity().y
            << "\nAuto: " << (_maze.getAutoNavigationEnabled() ? "On" : "Off");

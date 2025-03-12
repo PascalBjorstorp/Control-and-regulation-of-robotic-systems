@@ -14,6 +14,7 @@ add_executable(BallMazeGame main.cpp
     wall.h wall.cpp
     point3d.h point3d.cpp
     maze.h maze.cpp
+    motor.h motor.cpp
     updater.h updater.cpp
     Constants.h
 )

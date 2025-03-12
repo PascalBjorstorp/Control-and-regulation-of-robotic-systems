@@ -1,4 +1,5 @@
 #include "maze.h"
+#include <iostream>
 
 Maze::Maze() {
     // Setup the background plane as a rectangular convex shape
@@ -25,6 +26,9 @@ Maze::Maze() {
     // Create all the walls that make up the maze layout
     createMaze();
 
+    // Initialize timing for motors
+    _lastUpdateTime = _motorClock.getElapsedTime().asSeconds();
+
      // Initialize the 3D projection of all maze elements
     updateProjection();
 }
@@ -48,6 +52,22 @@ void Maze::createMaze() {
 
 
 void Maze::updateTilt() {
+    // Calculate time since last update
+    float currentTime = _motorClock.getElapsedTime().asSeconds();
+    float deltaTime = currentTime - _lastUpdateTime;
+    _lastUpdateTime = currentTime;
+    
+    // Ensure reasonable delta time (in case of debugging pauses)
+    if (deltaTime > 0.1f) deltaTime = 0.016f; // cap at ~60fps
+    
+    // Calculate target tilt based on key inputs
+    float targetTiltX = _motorX.getCurrentPosition();
+    float targetTiltY = _motorY.getCurrentPosition();
+    
+    // Calculate input based on keyboard state
+    // Note: The motors have momentum now, so we're adjusting target positions
+    const float angleChangeRate = Constants::TILT_SPEED * 10.0f; // Degrees per second
+
     // Primary controls (arrow keys) - full tilt speed
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))  _tiltY += Constants::TILT_SPEED;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) _tiltY -= Constants::TILT_SPEED;
@@ -60,10 +80,22 @@ void Maze::updateTilt() {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))  _tiltY -= Constants::TILT_SPEED/2;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))  _tiltY += Constants::TILT_SPEED/2;
 
-    // Clamp tilt angles to prevent excessive tilting
-    _tiltX = std::clamp(_tiltX, -Constants::MAX_TILT_ANGLE, Constants::MAX_TILT_ANGLE);
-    _tiltY = std::clamp(_tiltY, -Constants::MAX_TILT_ANGLE, Constants::MAX_TILT_ANGLE);
-
+    // Clamp target angles to prevent excessive tilting
+    targetTiltX = std::clamp(targetTiltX, -Constants::MAX_TILT_ANGLE, Constants::MAX_TILT_ANGLE);
+    targetTiltY = std::clamp(targetTiltY, -Constants::MAX_TILT_ANGLE, Constants::MAX_TILT_ANGLE);
+    
+    // Update motor target positions
+    _motorX.setTargetPosition(targetTiltX);
+    _motorY.setTargetPosition(targetTiltY);
+    
+    // Update motor physics
+    _motorX.update(deltaTime);
+    _motorY.update(deltaTime);
+    
+    // Get actual tilt angles from motors
+    _tiltX = _motorX.getCurrentPosition();
+    _tiltY = _motorY.getCurrentPosition();
+    
     // Update the visual projection based on new tilt angles
     updateProjection();
 }
@@ -136,108 +168,94 @@ bool Maze::checkCollisions(Ball& ball) {
     return false;
 }
 
+// To be fine tuned later
 void Maze::updateAutoNavigation(Ball& ball) {
-    // Exit early if auto-navigation is disabled
     if (!_autoNavigationEnabled) return;
 
-    // Determine which waypoint to target
-    Point3D currentTarget;
-    if (_currentWaypointIndex < _pathWaypoints.size()) {
-        currentTarget = _pathWaypoints[_currentWaypointIndex];
-    } else {
-        makeTarget();
-    }
+    float currentTime = _motorClock.getElapsedTime().asSeconds();
+    float deltaTime = currentTime - _lastUpdateTime;
+    _lastUpdateTime = currentTime;
 
-    // Get the current projected positions
-    Point3D rotatedTarget = currentTarget;
-    rotatedTarget.rotate(_tiltX, _tiltY);
-    sf::Vector2f targetPos = rotatedTarget.project();
+    float timeSinceControlUpdate = currentTime - _lastControlUpdateTime;
 
-    // Get the current ball position in 2D screen space
-    sf::Vector2f ballPos = ball.getShape().getPosition();
+    if (timeSinceControlUpdate >= 0.05f) {
+        _lastControlUpdateTime = currentTime;
 
-    // Get the current ball velocity
-    sf::Vector2f ballVel = ball.getVelocity();
-
-    // Calculate position error vector (Proportional term)
-    // This represents both distance and direction to the target
-    sf::Vector2f positionError = targetPos - ballPos;
-    float distanceToTarget = std::sqrt(positionError.x * positionError.x + positionError.y * positionError.y);
-
-    // Check if we've reached this waypoint
-    if (distanceToTarget < 5.0f) {
-        _currentWaypointIndex++;
-        
-        // If we've reached the end, cycle back to the first waypoint
-        if (_currentWaypointIndex > _pathWaypoints.size()) {
-            _currentWaypointIndex = 0;
+        Point3D currentTarget;
+        if (_pathWaypoints.size() >= 2) {
+            currentTarget = _pathWaypoints[1];
+        } else {
+            //makeTarget();
+            return;
         }
+
+        Point3D rotatedTarget = currentTarget;
+        rotatedTarget.rotate(_tiltX, _tiltY);
+        sf::Vector2f targetPos = rotatedTarget.project();
+
+        sf::Vector2f ballPos = ball.getShape().getPosition();
+        sf::Vector2f ballVel = ball.getVelocity();
+
+        sf::Vector2f positionError = targetPos - ballPos;
+        float distanceToTarget = std::sqrt(positionError.x * positionError.x + positionError.y * positionError.y);
+
+        if (distanceToTarget < 10.0f) {
+            //makeTarget();
+            _lastDesiredTiltX = 0;
+            _lastDesiredTiltY = 0;
+            return;
+        }
+
+        sf::Vector2f normalizedPosError(0, 0);
+        if (distanceToTarget > 0) {
+            normalizedPosError = positionError / distanceToTarget;
+        }
+
+        float ballSpeed = std::sqrt(ballVel.x * ballVel.x + ballVel.y * ballVel.y);
+
+        // Fixed PD gains for stable control
+        float proportionalGain = 0.4f;  // Proportional gain
+        float derivativeGain = 0.08f;      // Derivative gain
+
+        // Calculate control terms
+        // For X tilt (affects Y movement)
+        float propTiltX = proportionalGain * normalizedPosError.y; 
+        float derivTiltX = -derivativeGain * ballVel.y;
         
-        return; // We'll update targeting on next frame
+        // For Y tilt (affects X movement)
+        float propTiltY = -proportionalGain * normalizedPosError.x;
+        float derivTiltY = derivativeGain * ballVel.x;
+        
+        // Calculate desired tilt with smooth blending
+        float desiredTiltX = propTiltX + derivTiltX;
+        float desiredTiltY = propTiltY + derivTiltY;
+        
+        // Apply tilt angle limits
+        float maxTiltAngle = 2.f;
+        desiredTiltX = std::clamp(desiredTiltX, -maxTiltAngle, maxTiltAngle);
+        desiredTiltY = std::clamp(desiredTiltY, -maxTiltAngle, maxTiltAngle);
+        
+        // Apply smoother transitions with exponential smoothing
+        _lastDesiredTiltX = desiredTiltX;
+        _lastDesiredTiltY = desiredTiltY;     
     }
 
-    // Normalize the error vector to get pure direction
-    // This separates direction from distance for control purposes
-    sf::Vector2f normalizedPosError = positionError;
-    if (distanceToTarget > 0) {
-        normalizedPosError /= distanceToTarget;
-    }
+    _motorX.setTargetPosition(_lastDesiredTiltX);
+    _motorY.setTargetPosition(_lastDesiredTiltY);
+    _motorX.update(deltaTime);
+    _motorY.update(deltaTime);
 
-    // Calculate current speed (magnitude of velocity)
-    // Used to adjust control response based on how fast the ball is moving
-    float currentSpeed = std::sqrt(ballVel.x * ballVel.x + ballVel.y * ballVel.y);
+    _tiltX = _motorX.getCurrentPosition();
+    _tiltY = _motorY.getCurrentPosition();
 
-    // Define PD controller gains
-    // These values determine the control behavior:
-    float Kp = 1.f; // Proportional gain - how strongly to respond to position error
-                     // Higher values make the ball move more directly toward the target
-                     // but may cause overshooting
-    
-    float Kd = 0.3f; // Derivative gain - how strongly to dampen based on velocity
-                     // Higher values provide more braking/damping effect
-                     // which reduces oscillation but may make movement sluggish
-
-    // Scale proportional gain based on distance to target
-    // When far away: full strength (more aggressive steering)
-    // When close: reduced strength (gentler approach)
-    float distanceFactor = std::min(distanceToTarget / 100.0f, 1.f);
-    Kp *= distanceFactor;
-
-    // Calculate derivative term (negative velocity - we want to counter current motion)
-    sf::Vector2f velocityTerm = -ballVel;
-
-    // Calculate desired tilt angles based on the PD controller components
-    // The signs are important here to create the correct tilt direction:
-    // - For Y axis: negative error.x creates positive tilt to roll ball right
-    // - For X axis: positive error.y creates positive tilt to roll ball down
-    float desiredTiltY = (-normalizedPosError.x * Kp - velocityTerm.x * Kd) * Constants::MAX_TILT_ANGLE;
-    float desiredTiltX = (normalizedPosError.y * Kp + velocityTerm.y * Kd) * Constants::MAX_TILT_ANGLE;
-
-    // Apply a low-pass filter for smooth tilt transitions
-    // Alpha controls how quickly the actual tilt approaches the desired tilt
-    // Lower values create smoother, more gradual transitions
-    float alpha = 0.1f;
-    _tiltY = _tiltY * (1 - alpha) + desiredTiltY * alpha;
-    _tiltX = _tiltX * (1 - alpha) + desiredTiltX * alpha;
-
-    // Ensure tilt angles remain within allowed limits
-    _tiltX = std::clamp(_tiltX, -Constants::MAX_TILT_ANGLE, Constants::MAX_TILT_ANGLE);
-    _tiltY = std::clamp(_tiltY, -Constants::MAX_TILT_ANGLE, Constants::MAX_TILT_ANGLE);
-
-    // Update the visual projection based on new tilt angles
-    // This ensures all maze elements (walls, background, target) reflect the new tilt
     updateProjection();
-
-    if(distanceToTarget < 0.5) {
-        makeTarget();
-    }
 }
 
 void Maze::makeTarget(){    
     // Setup the target marker that the ball needs to reach
     // This is visualized as a green circle on the maze
     _targetMarker.setRadius(Constants::TARGET_RADIUS);
-    _targetMarker.setFillColor(sf::Color::Green);
+    _targetMarker.setFillColor(sf::Color(100, 100, 255, 150)); // Semi-transparent blue
     _targetMarker.setOrigin(Constants::TARGET_RADIUS, Constants::TARGET_RADIUS);
 
     // Create a random numbers between 0.15 and 0.85 to ensure the target is not too close to the edges
@@ -282,7 +300,7 @@ void Maze::generatePath() {
     
     // Add the start position as first waypoint
     _pathWaypoints.push_back(startPos);
-    
+    /*
     // Add intermediate waypoints to create an interesting path
     // This is a simple example - you can make this more complex
     const int numWaypoints = 3 + rand() % 3; // 3-5 waypoints
@@ -298,7 +316,7 @@ void Maze::generatePath() {
         
         _pathWaypoints.push_back(Point3D(wpX, wpY, 0));
     }
-    
+    */
     // Add target as the final waypoint
     _pathWaypoints.push_back(_targetPosition3D);
     

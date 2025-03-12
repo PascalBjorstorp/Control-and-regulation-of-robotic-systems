@@ -4,6 +4,7 @@
 // Maze class
 #include "ball.h"
 #include "wall.h"
+#include "motor.h"
 #include "Constants.h"
 #include <SFML/Graphics.hpp>
 #include <vector>
@@ -30,6 +31,23 @@ class Maze{
     std::vector<sf::CircleShape> _waypointMarkers;
     sf::VertexArray _pathPoints;
     size_t _currentWaypointIndex;
+
+    // Motors for the tilt system
+    Motor _motorX;  // Controls tilt around X axis
+    Motor _motorY;  // Controls tilt around Y axis
+    
+    // Timing variables
+    sf::Clock _motorClock;
+    float _lastUpdateTime = 0.0f;
+
+    float _lastControlUpdateTime = 0.0f;  // Tracks time of last control update
+    const float _controlUpdateInterval = 0.05f;  // 200ms between control updates
+    float _lastDesiredTiltX = 0.0f;  // Store last calculated tilt values
+    float _lastDesiredTiltY = 0.0f;
+
+    // PD controller constants
+    const float _kp = 0.8f;           // Proportional gain
+    const float _kd = 1.2f;           // Derivative gain    
 
 public:
 
@@ -136,8 +154,10 @@ public:
     Point3D getTargetPosition3D() { return _targetPosition3D; }
     float getTiltX() { return _tiltX; }
     float getTiltY() { return _tiltY; }
-     const sf::VertexArray& getPath() const { return _pathPoints; }
+    const sf::VertexArray& getPath() const { return _pathPoints; }
     const std::vector<sf::CircleShape>& getWaypointMarkers() const { return _waypointMarkers; }
+    float getMotorXSpeed() const { return _motorX.getCurrentSpeed(); }
+    float getMotorYSpeed() const { return _motorY.getCurrentSpeed(); }
 };
 
 #endif // MAZE_H

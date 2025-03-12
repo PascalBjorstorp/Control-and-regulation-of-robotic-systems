@@ -270,4 +270,5 @@ CMakeFiles/BallMazeGame.dir/updater.cpp.o: \
  /home/aksel/Desktop/Code/simu/point3d.h \
  /home/aksel/Desktop/Code/simu/Constants.h \
  /home/aksel/Desktop/Code/simu/maze.h \
- /home/aksel/Desktop/Code/simu/wall.h
+ /home/aksel/Desktop/Code/simu/wall.h \
+ /home/aksel/Desktop/Code/simu/motor.h

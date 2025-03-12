@@ -14,7 +14,7 @@ namespace Constants {
 
     // Maze settings
     inline constexpr float WALL_WIDTH = 10.f;
-    inline constexpr float MAX_TILT_ANGLE = 5.f;
+    inline constexpr float MAX_TILT_ANGLE = 10.f;
     inline constexpr float TILT_SPEED = 0.5f;
     inline constexpr float AUTO_CONTROL_STRENGTH = 0.2f;
     inline constexpr float TARGET_RADIUS = 5.f;

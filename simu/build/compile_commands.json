@@ -26,6 +26,11 @@
 },
 {
   "directory": "/home/aksel/Desktop/Code/simu/build",
+  "command": "/usr/bin/c++   -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/motor.cpp.o -c /home/aksel/Desktop/Code/simu/motor.cpp",
+  "file": "/home/aksel/Desktop/Code/simu/motor.cpp"
+},
+{
+  "directory": "/home/aksel/Desktop/Code/simu/build",
   "command": "/usr/bin/c++   -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/updater.cpp.o -c /home/aksel/Desktop/Code/simu/updater.cpp",
   "file": "/home/aksel/Desktop/Code/simu/updater.cpp"
 }

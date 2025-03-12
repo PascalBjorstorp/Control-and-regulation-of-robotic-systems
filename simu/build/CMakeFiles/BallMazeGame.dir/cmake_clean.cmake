@@ -7,6 +7,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/BallMazeGame.dir/main.cpp.o.d"
   "CMakeFiles/BallMazeGame.dir/maze.cpp.o"
   "CMakeFiles/BallMazeGame.dir/maze.cpp.o.d"
+  "CMakeFiles/BallMazeGame.dir/motor.cpp.o"
+  "CMakeFiles/BallMazeGame.dir/motor.cpp.o.d"
   "CMakeFiles/BallMazeGame.dir/point3d.cpp.o"
   "CMakeFiles/BallMazeGame.dir/point3d.cpp.o.d"
   "CMakeFiles/BallMazeGame.dir/updater.cpp.o"

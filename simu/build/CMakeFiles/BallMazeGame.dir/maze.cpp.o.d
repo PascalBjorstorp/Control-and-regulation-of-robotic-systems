@@ -264,4 +264,6 @@ CMakeFiles/BallMazeGame.dir/maze.cpp.o: \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
  /home/aksel/Desktop/Code/simu/Constants.h \
- /home/aksel/Desktop/Code/simu/wall.h
+ /home/aksel/Desktop/Code/simu/wall.h \
+ /home/aksel/Desktop/Code/simu/motor.h /usr/include/c++/11/iostream \
+ /usr/include/c++/11/istream /usr/include/c++/11/bits/istream.tcc

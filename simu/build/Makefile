@@ -221,6 +221,30 @@ maze.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BallMazeGame.dir/build.make CMakeFiles/BallMazeGame.dir/maze.cpp.s
 .PHONY : maze.cpp.s
 
+motor.o: motor.cpp.o
+.PHONY : motor.o
+
+# target to build an object file
+motor.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BallMazeGame.dir/build.make CMakeFiles/BallMazeGame.dir/motor.cpp.o
+.PHONY : motor.cpp.o
+
+motor.i: motor.cpp.i
+.PHONY : motor.i
+
+# target to preprocess a source file
+motor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BallMazeGame.dir/build.make CMakeFiles/BallMazeGame.dir/motor.cpp.i
+.PHONY : motor.cpp.i
+
+motor.s: motor.cpp.s
+.PHONY : motor.s
+
+# target to generate assembly for a file
+motor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BallMazeGame.dir/build.make CMakeFiles/BallMazeGame.dir/motor.cpp.s
+.PHONY : motor.cpp.s
+
 point3d.o: point3d.cpp.o
 .PHONY : point3d.o
 
@@ -313,6 +337,9 @@ help:
 	@echo "... maze.o"
 	@echo "... maze.i"
 	@echo "... maze.s"
+	@echo "... motor.o"
+	@echo "... motor.i"
+	@echo "... motor.s"
 	@echo "... point3d.o"
 	@echo "... point3d.i"
 	@echo "... point3d.s"
