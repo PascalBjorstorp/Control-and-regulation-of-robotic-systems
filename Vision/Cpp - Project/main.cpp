@@ -7,7 +7,6 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
-#include "functions.h"
 #include "SS_detect.h"
 #include "morph_funcs.h"
 #include "line_detection.h"
@@ -62,8 +61,8 @@ using namespace cv;
 */
 
 int main(int argc, char** argv) 
-{
-    Mat img = imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/Cpp - Project/test_img_ended.jpg", IMREAD_COLOR);
+{ 
+    Mat img = imread("/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/test_img_ended.jpg", IMREAD_COLOR); 
 
     //Check if image was read properly.
     if (img.empty()) { 
@@ -78,16 +77,19 @@ int main(int argc, char** argv)
     imshow("Window1", img);
 
     // Initialize Mat types for making masks for blue and red - To find start and stop points
-    Mat blue_img, red_img;
+    Mat green_img, blue_img, red_img, output;
+
+    // Initialize vector which will hold "lines" - coordinates for start and end points.
+    std::vector<Vec4i> lines;
 
     // Read mask for red and blue colors into Mat type
     red_img = isolate_red(img);
-
+    green_img = isolate_green(img);
     blue_img = isolate_blue(img);
 
     // Use hough circles algorithm to find coordinates for start and end points - save in SS_points
     std::vector<Vec3f> SS_points;
-    detect_SS(blue_img, SS_points);
+    detect_SS(green_img, SS_points);
     detect_SS(red_img, SS_points);
 
     // Remove the start and stop identifiers from image (white out)
@@ -102,28 +104,46 @@ int main(int argc, char** argv)
     // Dilate the image afterwards - Reduces the amount of fragmented segments in the skeleton
     perform_dilate(img);
 
-    //Declare Mat values for output showing - Use cvt to make correct amount of channels.
-    Mat output;
     cvtColor(img, output, COLOR_GRAY2BGR);
-
-    // Initialize vector which will hold "lines" - coordinates for start and end points.
-    std::vector<Vec4i> lines;
 
     // Detect the lines in img
     lines = detect_lines(img);
 
     // Sort the detected lines
-    lines = sort(img, lines, SS_points);
+    lines = sort(lines, SS_points);
 
-    // Draw the found lines
     for(size_t i = 0; i < lines.size(); i++){
         line(output, Point(lines[i][0], lines[i][1]), Point(lines[i][2], lines[i][3]), Scalar(0,0,255), 3, LINE_AA);
     }
 
-    namedWindow("first", WINDOW_NORMAL);
-    imshow("first", output);
+    namedWindow("Window2", WINDOW_GUI_NORMAL);
+    imshow("Window2", output);
 
     std::vector<Point> inters = find_inters(lines);
+
+    std::vector<Vec4i> comp_path = handle_inters(lines, inters);
+
+    for(size_t i = 0; i < comp_path.size(); i++){
+        line(output, Point(comp_path[i][0], comp_path[i][1]), Point(comp_path[i][2], comp_path[i][3]), Scalar(0,0,255), 3, LINE_AA);
+    }
+
+    for(size_t i = 0; i < comp_path.size(); i++){
+        circle(output, Point(comp_path[i][0], comp_path[i][1]), 30, Scalar(0,255,0), -1);
+
+        namedWindow("output", WINDOW_NORMAL);
+        imshow("output", output);
+        waitKey(0);
+
+        circle(output, Point(comp_path[i][2], comp_path[i][3]), 30, Scalar(0,0,255), -1);
+
+        namedWindow("output", WINDOW_NORMAL);
+        imshow("output", output);
+        waitKey(0);
+    }
+
+    for(size_t i = 0; i < SS_points.size(); i++){
+        circle(output, Point(SS_points[i][0], SS_points[i][1]), 30, Scalar(255,255,0), -1);
+    }
 
     for(size_t i = 0; i < inters.size(); i++){
         if(inters[i] == Point(-1,-1)){
@@ -134,14 +154,8 @@ int main(int argc, char** argv)
         }
     }
 
-    std::vector<Vec4i> comp_path = handle_inters(lines, inters);
-
-    for(size_t i = 0; i < comp_path.size(); i++){
-        line(output, Point(comp_path[i][0], comp_path[i][1]), Point(comp_path[i][2], comp_path[i][3]), Scalar(0,0,255), 3, LINE_AA);
-    }
-
-    namedWindow("first", WINDOW_NORMAL);
-    imshow("first", output);
+    namedWindow("output", WINDOW_NORMAL);
+    imshow("output", output);
 
     waitKey(0);
     destroyAllWindows();
