@@ -78,16 +78,16 @@ int main(int argc, char** argv)
     imshow("Window1", img);
 
     // Initialize Mat types for making masks for blue and red - To find start and stop points
-    Mat blue_img, red_img;
+    Mat green_img, blue_img, red_img;
 
     // Read mask for red and blue colors into Mat type
     red_img = isolate_red(img);
-
+    green_img = isolate_green(img);
     blue_img = isolate_blue(img);
 
     // Use hough circles algorithm to find coordinates for start and end points - save in SS_points
     std::vector<Vec3f> SS_points;
-    detect_SS(blue_img, SS_points);
+    detect_SS(green_img, SS_points);
     detect_SS(red_img, SS_points);
 
     // Remove the start and stop identifiers from image (white out)
@@ -113,15 +113,12 @@ int main(int argc, char** argv)
     lines = detect_lines(img);
 
     // Sort the detected lines
-    lines = sort(img, lines, SS_points);
+    lines = sort(lines, SS_points);
 
     // Draw the found lines
     for(size_t i = 0; i < lines.size(); i++){
         line(output, Point(lines[i][0], lines[i][1]), Point(lines[i][2], lines[i][3]), Scalar(0,0,255), 3, LINE_AA);
     }
-
-    namedWindow("first", WINDOW_NORMAL);
-    imshow("first", output);
 
     std::vector<Point> inters = find_inters(lines);
 
@@ -138,6 +135,10 @@ int main(int argc, char** argv)
 
     for(size_t i = 0; i < comp_path.size(); i++){
         line(output, Point(comp_path[i][0], comp_path[i][1]), Point(comp_path[i][2], comp_path[i][3]), Scalar(0,0,255), 3, LINE_AA);
+    }
+
+    for(size_t i = 0; i < SS_points.size(); i++){
+        circle(output, Point(SS_points[i][0], SS_points[i][1]), 30, Scalar(0,255,0), -1);
     }
 
     namedWindow("first", WINDOW_NORMAL);

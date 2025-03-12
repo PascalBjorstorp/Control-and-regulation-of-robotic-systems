@@ -23,6 +23,16 @@ Mat isolate_blue(const Mat img){
     return blue_img;
 }
 
+Mat isolate_green(const Mat img){
+    Mat hsv, green_img;
+
+    cvtColor(img, hsv, cv::COLOR_BGR2HSV);
+
+    inRange(hsv, Scalar(35, 100, 50), Scalar(85, 255, 255), green_img);
+    
+    return green_img;
+}
+
 
 void detect_SS(const Mat img, std::vector<Vec3f>& SS_points){
     Mat temp;

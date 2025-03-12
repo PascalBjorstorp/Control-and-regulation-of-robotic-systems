@@ -35,7 +35,7 @@ int find_start_line(std::vector<Vec4i> lines, std::vector<Vec3f> SS_points){
     /*
         Description:
         Calculates and returns the element id of the first line segment in vector lines.
-        The first line segment is defined as the line segment closest to the start identifier,,,,,,,,,,,,,,,
+        The first line segment is defined as the line segment closest to the start identifier
     */
 
     int temp_val;
@@ -186,11 +186,92 @@ std::vector<Vec4i> detect_lines(const Mat img){
     return temp_lines;
 }
 
-std::vector<Vec4i> sort(const Mat img, std::vector<Vec4i> lines, std::vector<Vec3f> SS_points){
+Vec4i find_closest_pair(const Vec4i line1, const Vec4i line2){
+
+    float min_dist = INT_MAX;
+    float dist;
+    Vec4i closest_pair;
+
+    // Iterate through all possible pairs of points
+    for (size_t i = 0; i < 3; i = i + 2) {
+
+        dist = calc_dist(Point(line1[0], line1[1]), Point(line2[i], line2[i+1]));
+        if(dist < min_dist){
+            min_dist = dist;
+            closest_pair = Vec4i(line1[0], line1[1], line2[i], line2[i+1]);
+        }
+
+        dist = calc_dist(Point(line1[2], line1[3]), Point(line2[i], line2[i+1]));
+        if(dist < min_dist){
+            min_dist = dist;
+            closest_pair = Vec4i(line1[2], line1[3], line2[i], line2[i+1]);
+        }
+    }
+
+    return closest_pair;
+}
+
+std::vector<Vec4i> conn_lines(const std::vector<Vec4i> lines, const std::vector<Vec3f> SS_points){
+    std::vector<Vec4i> temp_lines = lines;
+
+    Point start_pnt(SS_points[0][0], SS_points[0][1]);
+    Point end_pnt(SS_points[1][0], SS_points[1][1]);
+
+    for(size_t i = 0; i < lines.size(); i++){
+
+        Point line_pnt1(lines[i][0], lines[i][1]);
+        Point line_pnt2(lines[i][2], lines[i][3]);
+
+        if(i == 0){
+
+            if(calc_dist(line_pnt1, start_pnt) < calc_dist(line_pnt2, start_pnt)){
+                temp_lines[i][0] = start_pnt.x;
+                temp_lines[i][1] = start_pnt.y;
+            }
+            else{
+                temp_lines[i][2] = start_pnt.x;
+                temp_lines[i][3] = start_pnt.y;
+            }
+        }
+        else if(i == lines.size()-1){
+
+            if(calc_dist(line_pnt1, end_pnt) < calc_dist(line_pnt2, end_pnt)){
+                temp_lines[i][0] = end_pnt.x;
+                temp_lines[i][1] = end_pnt.y;
+            }
+            else{
+                temp_lines[i][2] = end_pnt.x;
+                temp_lines[i][3] = end_pnt.y;
+            }
+        }
+        
+        
+        if(!corner_between(lines[i], lines[i+1], 15)){
+            
+            Vec4i clos_points_2 = find_closest_pair(lines[i], lines[i+1]);
+
+            for(size_t j = 0; j < 3; j = j + 2){
+                if((lines[i][j] == clos_points_2[0]) && (lines[i][j+1] == clos_points_2[1])){
+                    temp_lines[i][j] = clos_points_2[2];
+                    temp_lines[i][j+1] = clos_points_2[3];
+                }
+            }
+        }
+    }
+
+    return temp_lines;
+}
+
+std::vector<Vec4i> sort(const std::vector<Vec4i> lines, const std::vector<Vec3f> SS_points){
+    std::vector<Vec4i> temp_lines;
 
     int start_id = find_start_line(lines, SS_points);
 
-    return sort_lines(lines, start_id);
+    temp_lines = sort_lines(lines, start_id);
+
+    temp_lines = conn_lines(temp_lines, SS_points);
+
+    return temp_lines;
 }
 
 int calc_angle(const Vec4i line1, const Vec4i line2){
@@ -219,8 +300,6 @@ int calc_angle(const Vec4i line1, const Vec4i line2){
 
     float angle = std::acos(cosTheta); // Radians
     angle = angle * (180.0 / CV_PI); // Degrees
-
-    std::cout << "angle: " << angle << std::endl;
 
     return angle;
 }

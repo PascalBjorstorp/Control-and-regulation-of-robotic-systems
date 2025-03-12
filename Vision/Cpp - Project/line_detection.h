@@ -28,7 +28,11 @@ std::vector<Vec4i> eliminate_overlap(const std::vector<Vec4i> line_Vec);
 
 std::vector<Vec4i> detect_lines(const Mat img);
 
-std::vector<Vec4i> sort(const Mat img, std::vector<Vec4i> lines, std::vector<Vec3f> SS_points);
+Vec4i find_closest_pair(const Vec4i line1, const Vec4i line2);
+
+std::vector<Vec4i> conn_lines(const std::vector<Vec4i> lines, const std::vector<Vec3f> SS_points);
+
+std::vector<Vec4i> sort(const std::vector<Vec4i> lines, const std::vector<Vec3f> SS_points);
 
 int calc_angle(const Vec4i line1, const Vec4i line2);
 
