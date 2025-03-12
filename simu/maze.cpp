@@ -20,9 +20,6 @@ Maze::Maze() {
         Point3D(-mazeWidth/2, mazeHeight/2, 0)    // Bottom-left
     };
 
-    // Create target
-    makeTarget();
-
     // Create all the walls that make up the maze layout
     createMaze();
 
@@ -185,7 +182,7 @@ void Maze::updateAutoNavigation(Ball& ball) {
         if (_pathWaypoints.size() >= 2) {
             currentTarget = _pathWaypoints[1];
         } else {
-            //makeTarget();
+            makeTarget(ball);
             return;
         }
 
@@ -198,13 +195,6 @@ void Maze::updateAutoNavigation(Ball& ball) {
 
         sf::Vector2f positionError = targetPos - ballPos;
         float distanceToTarget = std::sqrt(positionError.x * positionError.x + positionError.y * positionError.y);
-
-        if (distanceToTarget < 10.0f) {
-            //makeTarget();
-            _lastDesiredTiltX = 0;
-            _lastDesiredTiltY = 0;
-            return;
-        }
 
         sf::Vector2f normalizedPosError(0, 0);
         if (distanceToTarget > 0) {
@@ -251,23 +241,33 @@ void Maze::updateAutoNavigation(Ball& ball) {
     updateProjection();
 }
 
-void Maze::makeTarget(){    
+void Maze::makeTarget(Ball& ball){
     // Setup the target marker that the ball needs to reach
     // This is visualized as a green circle on the maze
     _targetMarker.setRadius(Constants::TARGET_RADIUS);
     _targetMarker.setFillColor(sf::Color(100, 100, 255, 150)); // Semi-transparent blue
     _targetMarker.setOrigin(Constants::TARGET_RADIUS, Constants::TARGET_RADIUS);
 
+    std::vector<cv::Point> points = get_inters();
+    float imgWidth = get_img().cols;
+    float imgHeight = get_img().rows;
+
+    float mazeWidth = Constants::WINDOW_WIDTH - 200;
+    float mazeHeight = Constants::WINDOW_HEIGHT - 200;
+
+    float xAdd = ((-mazeWidth/2)+Constants::WINDOW_WIDTH/2)/mazeWidth;
+    float yAdd = ((-mazeHeight/2)+Constants::WINDOW_HEIGHT/2)/mazeHeight;
+
     // Create a random numbers between 0.15 and 0.85 to ensure the target is not too close to the edges
-    float randomX = 0.15 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.85 - 0.15)));
+    float multiplierX = xAdd + points[points.size()-1].x/(imgWidth);
 
     // Create a random number between 0.2 and 0.8 to ensure the target is not too close to the edges
-    float randomY = 0.2 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.8 - 0.2)));
+    float multiplierY = yAdd + points[points.size()-1].y/(imgHeight);
 
     // Set the 3D position of the target
     _targetPosition3D = Point3D(
-        Constants::WINDOW_WIDTH * randomX - Constants::WINDOW_WIDTH/2,    // X position 
-        Constants::WINDOW_HEIGHT * randomY - Constants::WINDOW_HEIGHT/2,  // Y position
+        mazeWidth * multiplierX - Constants::WINDOW_WIDTH/2,    // X position
+        mazeHeight * multiplierY - Constants::WINDOW_HEIGHT/2,  // Y position
         0                                                                 // Z position
     );
 
@@ -276,7 +276,7 @@ void Maze::makeTarget(){
     _targetMarker.setPosition(_targetPosition);
 
     // Generate a path for the ball to follow
-    generatePath();
+    generatePath(ball);
 }
 
 /**
@@ -285,38 +285,42 @@ void Maze::makeTarget(){
  * Creates a sequence of points from the starting position to the target,
  * forming a path through the maze that avoids walls.
  */
-void Maze::generatePath() {
+void Maze::generatePath(Ball& ball) {
     // Clear any existing path
     _pathPoints.clear();
     _pathWaypoints.clear();
     _currentWaypointIndex = 0;
-
-    // Start from the default ball starting position
-    Point3D startPos = Point3D(
-        Constants::WINDOW_WIDTH / 4 - Constants::WINDOW_WIDTH/2, 
-        Constants::WINDOW_HEIGHT / 4 - Constants::WINDOW_HEIGHT/2,
-        0
-    );
     
-    // Add the start position as first waypoint
-    _pathWaypoints.push_back(startPos);
-    /*
+    std::vector<cv::Point> points = get_inters();
+
     // Add intermediate waypoints to create an interesting path
     // This is a simple example - you can make this more complex
-    const int numWaypoints = 3 + rand() % 3; // 3-5 waypoints
     
     float mazeWidth = Constants::WINDOW_WIDTH - 200;
     float mazeHeight = Constants::WINDOW_HEIGHT - 200;
+    float imgWidth = get_img().cols;
+    float imgHeight = get_img().rows;
+    float xAdd = ((-mazeWidth/2)+Constants::WINDOW_WIDTH/2)/mazeWidth;
+    float yAdd = ((-mazeHeight/2)+Constants::WINDOW_HEIGHT/2)/mazeHeight;
     
-    for (int i = 0; i < numWaypoints; i++) {
+    for (int i = 0; i < points.size()-1; i++) {
+        // Create a random numbers between 0.15 and 0.85 to ensure the target is not too close to the edges
+        float randomX = xAdd + points[i].x/(imgWidth);
+
+        // Create a random number between 0.2 and 0.8 to ensure the target is not too close to the edges
+        float randomY = yAdd + points[i].y/(imgHeight);
+
         // Create random waypoints that are at a reasonable distance from each other
         // and avoid being too close to the edges
-        float wpX = (rand() % static_cast<int>(mazeWidth * 0.7f) - mazeWidth * 0.35f);
-        float wpY = (rand() % static_cast<int>(mazeHeight * 0.7f) - mazeHeight * 0.35f);
+
+        float wpX = mazeWidth * randomX - Constants::WINDOW_WIDTH/2;
+        float wpY = mazeHeight * randomY - Constants::WINDOW_HEIGHT/2;
         
         _pathWaypoints.push_back(Point3D(wpX, wpY, 0));
     }
-    */
+
+    ball.setPosition3D(_pathWaypoints[0]);
+
     // Add target as the final waypoint
     _pathWaypoints.push_back(_targetPosition3D);
     

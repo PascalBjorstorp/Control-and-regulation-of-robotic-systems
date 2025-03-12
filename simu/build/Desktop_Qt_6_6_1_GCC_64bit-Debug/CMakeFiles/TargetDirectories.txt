@@ -1,0 +1,3 @@
+/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build/Desktop_Qt_6_6_1_GCC_64bit-Debug/CMakeFiles/BallMazeGame.dir
+/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build/Desktop_Qt_6_6_1_GCC_64bit-Debug/CMakeFiles/edit_cache.dir
+/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build/Desktop_Qt_6_6_1_GCC_64bit-Debug/CMakeFiles/rebuild_cache.dir

@@ -62,8 +62,8 @@ using namespace cv;
 */
 
 int main(int argc, char** argv) 
-{ 
-    Mat img = imread("/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/test_img_ended.jpg", IMREAD_COLOR); 
+{
+    Mat img = imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/Cpp - Project/test_img_ended.jpg", IMREAD_COLOR);
 
     //Check if image was read properly.
     if (img.empty()) { 

@@ -1,0 +1,9 @@
+# ninja log v5
+0	2443	1741766616899320545	CMakeFiles/vision.dir/SS_detect.cpp.o	a2a3c2b6deae999c
+1	2535	1741766616992319709	CMakeFiles/vision.dir/morph_funcs.cpp.o	13cc760789c1afa3
+0	2726	1741766617182318003	CMakeFiles/vision.dir/functions.cpp.o	d6b0efec09ee30b1
+0	2745	1741766617202317823	CMakeFiles/vision.dir/main.cpp.o	c4310a3224588ce6
+1	2776	1741766617232317554	CMakeFiles/vision.dir/line_detection.cpp.o	4e8e4f9bc222694b
+2776	2940	1741766617396316081	vision	b160afdfed11e599
+1	1813	1741766652005007260	CMakeFiles/vision.dir/main.cpp.o	c4310a3224588ce6
+1813	1944	1741766652134006117	vision	b160afdfed11e599

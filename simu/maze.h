@@ -3,13 +3,14 @@
 
 // Maze class
 #include "ball.h"
+#include "linedetecter.h"
 #include "wall.h"
 #include "motor.h"
 #include "Constants.h"
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-class Maze{
+class Maze : public lineDetecter{
     // Maze variables
     std::vector<Wall> _walls;
     sf::ConvexShape _background;
@@ -139,9 +140,8 @@ public:
      * This method generates a random target position within the maze bounds
      * and projects it to 3D space for proper perspective projection.
      */
-    void makeTarget();
-
-    void generatePath();
+    void makeTarget(Ball &ball);
+    void generatePath(Ball& ball);
     void createPathVisuals();
     void updatePathProjection();
 
