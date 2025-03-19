@@ -154,6 +154,12 @@ int main(int argc, char** argv)
         }
     }
 
+    Vec4i templine;
+
+    templine = perp_line(lines[1], 50);
+
+    line(output, Point(templine[0], templine[1]), Point(templine[2], templine[3]), Scalar(255,0,0), 5);
+
     namedWindow("output", WINDOW_NORMAL);
     imshow("output", output);
 

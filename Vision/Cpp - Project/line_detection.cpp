@@ -37,8 +37,6 @@ int find_start_line(std::vector<Vec4i> lines, std::vector<Vec3f> SS_points){
         Calculates and returns the element id of the first line segment in vector lines.
         The first line segment is defined as the line segment closest to the start identifier
     */
-
-    int temp_val;
     
     Point start_pnt(SS_points[0][0], SS_points[0][1]);
 
@@ -53,7 +51,7 @@ int find_start_line(std::vector<Vec4i> lines, std::vector<Vec3f> SS_points){
         }
     }
 
-    return temp_val;
+    return temp_id;
 }
 
 std::vector<Vec4i> sort_lines(const std::vector<Vec4i> lines, const int start_id){
@@ -444,4 +442,27 @@ std::vector<Vec4i> handle_inters(const std::vector<Vec4i> lines, const std::vect
     }
 
     return temp_lines;
+}
+
+Vec4i perp_line(const Vec4i line, const float len){
+    Point line_start(line[0], line[1]);
+    Point line_end(line[2], line[3]);
+
+    // Calculate the directional vector
+    Point dir = line_end - line_start;
+
+    // Create a perpendicular vector by swapping the components and changing the sign of one of them
+    Point perp_dir(-dir.y, dir.x);
+
+    // Normalize the perpendicular vector
+    float norm = sqrt(perp_dir.x * perp_dir.x + perp_dir.y * perp_dir.y);
+    perp_dir.x = static_cast<int>(perp_dir.x / norm * len);
+    perp_dir.y = static_cast<int>(perp_dir.y / norm * len);
+
+    // Calculate the new end points for the perpendicular line
+    Point new_start = line_start + perp_dir;
+    Point new_end = line_start - perp_dir;
+
+    // Return the perpendicular line
+    return Vec4i(new_start.x, new_start.y, new_end.x, new_end.y);
 }

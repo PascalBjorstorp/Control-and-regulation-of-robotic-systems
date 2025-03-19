@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Site BuildName="Linux-c++"
-	BuildStamp="20250312-0731-Experimental"
+	BuildStamp="20250319-0757-Experimental"
 	Name="mads-hyrup-P03RGS"
 	Generator="ctest-3.28.3"
 	CompilerName="/usr/bin/c++"
 	CompilerVersion="13.3.0"
 	OSName="Linux"
 	Hostname="mads-hyrup-P03RGS"
-	OSRelease="6.8.0-54-generic"
-	OSVersion="#56-Ubuntu SMP PREEMPT_DYNAMIC Sat Feb  8 00:37:57 UTC 2025"
+	OSRelease="6.8.0-55-generic"
+	OSVersion="#57-Ubuntu SMP PREEMPT_DYNAMIC Wed Feb 12 23:42:21 UTC 2025"
 	OSPlatform="x86_64"
 	Is64Bits="1"
 	VendorString="GenuineIntel"
@@ -21,14 +21,14 @@
 	TotalVirtualMemory="4095"
 	TotalPhysicalMemory="15550"
 	LogicalProcessorsPerPhysical="1"
-	ProcessorClockFrequency="900.083"
+	ProcessorClockFrequency="3800"
 	>
 	<Testing>
-		<StartDateTime>Mar 12 15:01 CET</StartDateTime>
-		<StartTestTime>1741788115</StartTestTime>
+		<StartDateTime>Mar 19 08:57 CET</StartDateTime>
+		<StartTestTime>1742371043</StartTestTime>
 		<TestList/>
-		<EndDateTime>Mar 12 15:01 CET</EndDateTime>
-		<EndTestTime>1741788115</EndTestTime>
+		<EndDateTime>Mar 19 08:57 CET</EndDateTime>
+		<EndTestTime>1742371043</EndTestTime>
 		<ElapsedMinutes>0</ElapsedMinutes>
 	</Testing>
 </Site>

@@ -45,3 +45,5 @@ Point calc_inter(const Vec4i line1, const Vec4i line2);
 std::vector<Point> find_inters(const std::vector<Vec4i> lines);
 
 std::vector<Vec4i> handle_inters(const std::vector<Vec4i> lines, const std::vector<Point> inters);
+
+Vec4i perp_line(const Vec4i line, const float len);
