@@ -83,32 +83,37 @@ int lineDetecter::find_start_line(){
         The first line segment is defined as the line segment closest to the start identifier,,,,,,,,,,,,,,,
     */
 
-    int temp_val;
-
     cv::Point start_pnt(_SS_points[0][0], _SS_points[0][1]);
 
-    int temp_id, temp_dist, min_dist = INT_MAX;
+    int temp_id, temp_dist1, temp_dist2, min_dist = INT_MAX;
 
     for(size_t i = 0; i < _lines.size(); i++){
-        temp_dist = calc_dist(start_pnt, cv::Point(_lines[i][0], _lines[i][1]));
+        temp_dist1 = calc_dist(start_pnt, cv::Point(_lines[i][0], _lines[i][1]));
+        temp_dist2 = calc_dist(start_pnt, cv::Point(_lines[i][2], _lines[i][3]));
 
-        if(temp_dist < min_dist){
-            min_dist = temp_dist;
+        if(temp_dist1 < min_dist){
+            min_dist = temp_dist1;
+            temp_id = i;
+        }
+        if(temp_dist2 < min_dist){
+            min_dist = temp_dist2;
             temp_id = i;
         }
     }
 
-    return temp_val;
+    return temp_id;
 }
 
 void lineDetecter::sort_lines(const int start_id){
     std::vector<cv::Vec4i> sorted_lines, temp_lines = _lines;
     cv::Point temp_pnt, temp_target_pnt;
     int temp_dist, temp_id, target_id = start_id;
+    bool toFlip = false;
 
     for(int i = 0; i < _lines.size(); i++){
         int min_dist = INT_MAX;
         temp_target_pnt = cv::Point(_lines[target_id][2], _lines[target_id][3]);
+        toFlip = false;
 
         for(size_t j = 0; j < temp_lines.size(); j++){
             temp_pnt = cv::Point(temp_lines[j][0], temp_lines[j][1]);
@@ -117,14 +122,38 @@ void lineDetecter::sort_lines(const int start_id){
             if((min_dist > temp_dist)){
                 min_dist = temp_dist;
                 temp_id = j;
+                toFlip = false;
+            }
+
+            temp_pnt = cv::Point(temp_lines[j][2], temp_lines[j][3]);
+            temp_dist = calc_dist(temp_target_pnt, temp_pnt);
+
+            if((min_dist > temp_dist)){
+                min_dist = temp_dist;
+                temp_id = j;
+                toFlip = true;
             }
         }
 
         for(size_t j = 0; j < _lines.size(); j++){
             if(_lines[j] == temp_lines[temp_id]){
                 target_id = j;
+                if(toFlip){
+                    // Flip the line
+                    cv::Point temp;
+
+                    temp.x = _lines[j][0];
+                    temp.y = _lines[j][1];
+
+                    _lines[j][0] = _lines[j][2];
+                    _lines[j][1] = _lines[j][3];
+
+                    _lines[j][2] = temp.x;
+                    _lines[j][3] = temp.y;
+                }
                 sorted_lines.push_back(_lines[j]);
                 temp_lines.erase(temp_lines.begin() + temp_id);
+
                 break;
             }
         }
@@ -426,7 +455,7 @@ cv::Point lineDetecter::calc_inter(const cv::Vec4i line1, const cv::Vec4i line2)
 void lineDetecter::find_inters(){
     cv::Point inter;
     std::vector<cv::Vec4i> ext_lines = _lines;
-    int angle_limit = 15;
+    int angle_limit = 5;
 
     for(size_t i = 0; i < _lines.size()-1; i++){
         if(corner_between(_lines[i], _lines[i+1], angle_limit)){

@@ -65,7 +65,7 @@ void imageHandler::rmv_SS(){
 }
 
 void imageHandler::perform_skeletonization(){
-    threshold(_img, _img, 145, 255, cv::THRESH_BINARY_INV);
+    threshold(_img, _img, 70, 255, cv::THRESH_BINARY_INV);
 
     //Declare variables with correct color channels - 8 bit 1 color
     cv::Mat skel(cv::Mat::zeros(_img.size(), CV_8UC1)), temp(cv::Mat::zeros(_img.size(), CV_8UC1)), eroded(cv::Mat::zeros(_img.size(), CV_8UC1));
