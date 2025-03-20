@@ -9,6 +9,7 @@ lineDetecter::lineDetecter(cv::Mat img): imageHandler(img){
     detect_lines();
     sort();
 
+    /*
     // Draw the found lines
     for(size_t i = 0; i < _lines.size(); i++){
         line(output, cv::Point(_lines[i][0], _lines[i][1]), cv::Point(_lines[i][2], _lines[i][3]), cv::Scalar(0,0,255), 3, cv::LINE_AA);
@@ -16,11 +17,12 @@ lineDetecter::lineDetecter(cv::Mat img): imageHandler(img){
 
     namedWindow("first", cv::WINDOW_NORMAL);
     imshow("first", output);
+    */
 
     find_inters();
 
     handle_inters();
-
+/*
     for(size_t i = 0; i < _comp_path.size(); i++){
         line(output, cv::Point(_comp_path[i][0], _comp_path[i][1]), cv::Point(_comp_path[i][2], _comp_path[i][3]), cv::Scalar(0,0,255), 3, cv::LINE_AA);
     }
@@ -30,31 +32,38 @@ lineDetecter::lineDetecter(cv::Mat img): imageHandler(img){
 
         namedWindow("output", cv::WINDOW_NORMAL);
         imshow("output", output);
+        std::cout << "Første punkt: " << "x: " << _comp_path[i][0] << " y: " << _comp_path[i][1] << std::endl;
         cv::waitKey(0);
 
         circle(output, cv::Point(_comp_path[i][2], _comp_path[i][3]), 30, cv::Scalar(0,0,255), -1);
+        std::cout << "Andet punkt: " << "x: " << _comp_path[i][2] << " y: " << _comp_path[i][3] << std::endl;
 
         namedWindow("output", cv::WINDOW_NORMAL);
         imshow("output", output);
+        line(output, cv::Point(_perps[i][0], _perps[i][1]), cv::Point(_perps[i][2], _perps[i][3]), cv::Scalar(0,255,255), 5, cv::LINE_AA);
+        std::cout << "x1: " << _perps[i][0] << " y1: " << _perps[i][1] << " x2: " << _perps[i][2] << " y2: " << _perps[i][3] << std::endl;
         cv::waitKey(0);
     }
-
+*/
 
     for(size_t i = 0; i < _SS_points.size(); i++){
         circle(output, cv::Point(_SS_points[i][0], _SS_points[i][1]), 30, cv::Scalar(255,255,0), -1);
     }
 
-    for(size_t i = 0; i < _inters.size(); i++){
+    for(size_t i = 0; i < _inters.size()-1; i++){
         if(_inters[i] == cv::Point(-1,-1)){
             continue;
         }
         else{
-            circle(output, _inters[i], 30, cv::Scalar(255,0,0), -1);
+            circle(output, _inters[i], 30, cv::Scalar(0,0,255), -1);
+            line(output, cv::Point(_inters[i].x, _inters[i].y), cv::Point(_inters[i+1].x, _inters[i+1].y), cv::Scalar(0,255,0), 5, cv::LINE_AA);
+            namedWindow("output", cv::WINDOW_NORMAL);
+            imshow("output", output);
+            cv::waitKey(0);
         }
     }
 
-    namedWindow("output", cv::WINDOW_NORMAL);
-    imshow("output", output);
+
 
     cv::waitKey(0);
     cv::destroyAllWindows();
@@ -86,6 +95,7 @@ int lineDetecter::find_start_line(){
     cv::Point start_pnt(_SS_points[0][0], _SS_points[0][1]);
 
     int temp_id, temp_dist1, temp_dist2, min_dist = INT_MAX;
+    bool toFlip = false;
 
     for(size_t i = 0; i < _lines.size(); i++){
         temp_dist1 = calc_dist(start_pnt, cv::Point(_lines[i][0], _lines[i][1]));
@@ -94,11 +104,27 @@ int lineDetecter::find_start_line(){
         if(temp_dist1 < min_dist){
             min_dist = temp_dist1;
             temp_id = i;
+            toFlip = false;
         }
         if(temp_dist2 < min_dist){
             min_dist = temp_dist2;
             temp_id = i;
+            toFlip = true;
         }
+    }
+
+    if(toFlip){
+        // Flip the line
+        cv::Point temp;
+
+        temp.x = _lines[temp_id][0];
+        temp.y = _lines[temp_id][1];
+
+        _lines[temp_id][0] = _lines[temp_id][2];
+        _lines[temp_id][1] = _lines[temp_id][3];
+
+        _lines[temp_id][2] = temp.x;
+        _lines[temp_id][3] = temp.y;
     }
 
     return temp_id;
@@ -106,9 +132,14 @@ int lineDetecter::find_start_line(){
 
 void lineDetecter::sort_lines(const int start_id){
     std::vector<cv::Vec4i> sorted_lines, temp_lines = _lines;
+    std::vector<cv::Vec4i> sorted_perps;
     cv::Point temp_pnt, temp_target_pnt;
     int temp_dist, temp_id, target_id = start_id;
     bool toFlip = false;
+
+    sorted_lines.push_back(_lines[start_id]);
+    sorted_perps.push_back(_perps[start_id]);
+    temp_lines.erase(temp_lines.begin() + start_id);
 
     for(int i = 0; i < _lines.size(); i++){
         int min_dist = INT_MAX;
@@ -152,13 +183,15 @@ void lineDetecter::sort_lines(const int start_id){
                     _lines[j][3] = temp.y;
                 }
                 sorted_lines.push_back(_lines[j]);
+                sorted_perps.push_back(_perps[j]);
                 temp_lines.erase(temp_lines.begin() + temp_id);
+
 
                 break;
             }
         }
     }
-
+    _perps = sorted_perps;
     _lines = sorted_lines;
 }
 
@@ -251,7 +284,7 @@ void lineDetecter::eliminate_overlap() {
 void lineDetecter::detect_lines(){
     HoughLinesP(_img, _lines, 1, CV_PI/180, 50, 50, 10); // runs the actual detection
 
-    eliminate_small_lines(180);
+    eliminate_small_lines(_min_length);
 
     eliminate_overlap();
 }
@@ -338,7 +371,7 @@ void lineDetecter::flip(){
     cv::Point temp;
     float dist1, dist2;
 
-    for(size_t i = 0; i < _lines.size(); i++){
+    for(size_t i = 1; i < _lines.size(); i++){
         dist1 = calc_dist(cv::Point(_lines[i][0], _lines[i][1]), cv::Point(_lines[i - 1][2], _lines[i - 1][3]));
         dist2 = calc_dist(cv::Point(_lines[i][2], _lines[i][3]), cv::Point(_lines[i - 1][2], _lines[i - 1][3]));
 
@@ -360,13 +393,19 @@ void lineDetecter::flip(){
 
 void lineDetecter::sort(){
 
-    int start_id = find_start_line();
+    perp_line();
 
-    sort_lines(start_id);
+    sort_perps();
+
+    _start_id = find_start_line();
+
+    sort_lines(_start_id);
 
     conn_lines();
 
     flip();
+
+    eliminate_long_lines(700);
 }
 
 int lineDetecter::calc_angle(const cv::Vec4i line1, const cv::Vec4i line2){
@@ -456,6 +495,7 @@ void lineDetecter::find_inters(){
     cv::Point inter;
     std::vector<cv::Vec4i> ext_lines = _lines;
     int angle_limit = 5;
+    _inters.push_back(cv::Point(_SS_points[0][0], _SS_points[0][1]));
 
     for(size_t i = 0; i < _lines.size()-1; i++){
         if(corner_between(_lines[i], _lines[i+1], angle_limit)){
@@ -464,10 +504,9 @@ void lineDetecter::find_inters(){
             inter = calc_inter(_lines[i], _lines[i+1]);
             _inters.push_back(inter);
         }
-        else{
-            _inters.push_back(cv::Point(-1,-1));
-        }
     }
+
+    _inters.push_back(cv::Point(_SS_points[1][0], _SS_points[1][1]));
 }
 
 void lineDetecter::handle_inters(){
@@ -506,4 +545,80 @@ void lineDetecter::handle_inters(){
     }
 
     _comp_path = temp_lines;
+}
+
+void lineDetecter::perp_line(){
+    for(size_t i = 0; i < _lines.size(); i++){
+        cv::Point line_start(_lines[i][0], _lines[i][1]);
+        cv::Point line_end(_lines[i][2], _lines[i][3]);
+
+        // Calculate the directional vector
+        cv::Point dir = line_end - line_start;
+        cv::Point middle = line_start + (dir/2);
+
+        // Create a perpendicular vector by swapping the components and changing the sign of one of them
+        cv::Point perp_dir(-dir.y, dir.x);
+
+        // Normalize the perpendicular vector
+        float norm = sqrt(perp_dir.x * perp_dir.x + perp_dir.y * perp_dir.y);
+        perp_dir.x = static_cast<int>((perp_dir.x / norm) * _perp_length);
+        perp_dir.y = static_cast<int>((perp_dir.y / norm) * _perp_length);
+
+        // Calculate the new end points for the perpendicular line
+        cv::Point new_start = middle + perp_dir;
+        cv::Point new_end = middle - perp_dir;
+
+        _perps.push_back(cv::Vec4i(new_start.x, new_start.y, new_end.x, new_end.y));
+    }
+}
+
+void lineDetecter::sort_perps(){
+    std::vector<cv::Vec4i> temp_lines;
+    std::vector<cv::Vec4i> temp_perps;
+    bool found = false;
+
+    for(size_t i = 0; i < _perps.size(); i++){
+        int temp_id = i;
+        for (size_t j = 0; j < _lines.size(); j++) {
+            if (i == j || j == _start_id) {
+                continue;
+            }
+
+            if (detect_overlap(_perps[i], _lines[j])) {
+                if (calc_line_len(_lines[temp_id]) < calc_line_len(_lines[j])) {
+                    temp_id = j;
+                }
+            }
+        }
+
+        found = false;
+
+        for (size_t j = 0; j < temp_lines.size(); j++) {
+            if(temp_lines[j] == _lines[temp_id]){
+                found = true;
+                break;
+            }
+        }
+
+        if(!found){
+            temp_lines.push_back(_lines[temp_id]);
+            temp_perps.push_back(_perps[temp_id]);
+        }
+    }
+
+    _lines = temp_lines;
+    _perps = temp_perps;
+}
+
+void lineDetecter::eliminate_long_lines(int max_len){
+    int len;
+
+    for(size_t i = 0; i < _lines.size(); i++){
+        len = calc_line_len(_lines[i]);
+
+        if(len >= max_len){
+            _lines.erase(_lines.begin() + i);
+            i--;
+        }
+    }
 }

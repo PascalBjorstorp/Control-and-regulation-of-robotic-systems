@@ -16,6 +16,11 @@ class lineDetecter : public imageHandler
     cv::Mat _img, output;
     std::vector<cv::Point> _inters;
     std::vector<cv::Vec4i> _comp_path;
+    std::vector<cv::Vec4i> _perps;
+    std::vector<int> _perp_and_line_id;
+    int _start_id = 0;
+    int _min_length = 1;
+    int _perp_length = 55;
 
 public:
     explicit lineDetecter(cv::Mat img);
@@ -55,6 +60,12 @@ public:
     void find_inters();
 
     void handle_inters();
+
+    void perp_line();
+
+    void sort_perps();
+
+    void eliminate_long_lines(int max_len);
 
     std::vector<cv::Point> get_inters() { return _inters; }
 };

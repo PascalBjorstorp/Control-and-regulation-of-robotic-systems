@@ -1,9 +1,9 @@
 #include "linedetecter.h"
 
-lineDetecter::lineDetecter():imageHandler(imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/Cpp - Project/test_img_2.jpg", cv::IMREAD_COLOR)){
+lineDetecter::lineDetecter():imageHandler(imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/Cpp - Project/test_img_ended.jpg", cv::IMREAD_COLOR)){
 
     _img = get_img();
-    output = imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/Cpp - Project/test_img_2.jpg", cv::IMREAD_COLOR);
+    output = imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/Cpp - Project/test_img_ended.jpg", cv::IMREAD_COLOR);
     _SS_points = get_SS_points();
 
     detect_lines();
