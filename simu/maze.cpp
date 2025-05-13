@@ -28,6 +28,8 @@ Maze::Maze(cv::Mat img) : lineDetecter(img) {
 
      // Initialize the 3D projection of all maze elements
     updateProjection();
+
+    makeTarget(); // Create the target marker
 }
 
 void Maze::createMaze() {
@@ -46,7 +48,6 @@ void Maze::createMaze() {
     // Right vertical border
     _walls.push_back(Wall(Constants::WALL_LENGTH + Constants::WALL_X + 10, Constants::WALL_Y + 10, Constants::WALL_LENGTH, false));
 }
-
 
 void Maze::updateTilt() {  
     // Calculate input based on keyboard state
@@ -99,42 +100,6 @@ void Maze::updateProjection() {
 void Maze::toggleAutoNavigation() {
     // Toggle the auto-navigation mode on or off
     _autoNavigationEnabled = !_autoNavigationEnabled;
-}
-
-bool Maze::checkCollisions(Ball& ball) {
-    // Create a copy of the ball's 3D position and velocity
-    Point3D ballPos = ball.getPosition3D();
-    sf::Vector2f ballVel = ball.getVelocity();
-
-    // Check if ball goes out of bounds
-    float mazeWidth = Constants::WINDOW_WIDTH - 200;
-    float mazeHeight = Constants::WINDOW_HEIGHT - 200;
-
-    // Checks if the ball is outside the maze bounds
-    if (std::abs(ballPos._x) > mazeWidth / 2 - Constants::BALL_RADIUS ||
-        std::abs(ballPos._y) > mazeHeight / 2 - Constants::BALL_RADIUS) {
-
-        // Bounce off the edge in the x-direction
-        if (std::abs(ballPos._x) > mazeWidth / 2 - Constants::BALL_RADIUS) {
-            float newVelx = ballVel.x * -0.5f;
-            ball.setVelocity(sf::Vector2f(newVelx, ballVel.y));
-
-            float newX = (mazeWidth / 2 - Constants::BALL_RADIUS) * (ballPos._x > 0 ? 1 : -1);
-            ball.setPosition3D(Point3D(newX, ballPos._y, ballPos._z));
-        }
-
-        // Bounce off the edge in the y-direction
-        if (std::abs(ballPos._y) > mazeHeight / 2 - Constants::BALL_RADIUS) {
-            float newVely = ballVel.y * -0.5f;
-            ball.setVelocity(sf::Vector2f(ballVel.x, newVely));
-
-            float newY = (mazeHeight / 2 - Constants::BALL_RADIUS) * (ballPos._y > 0 ? 1 : -1);
-            ball.setPosition3D(Point3D(ballPos._x, newY, ballPos._z));
-        }
-        return true;
-    }
-
-    return false;
 }
 
 void Maze::updateAutoNavigation(Ball& ball) {
@@ -249,7 +214,7 @@ void Maze::updateAutoNavigation(Ball& ball) {
     updateProjection();
 }
 
-void Maze::makeTarget(Ball& ball){
+void Maze::makeTarget(){
     // Setup the target marker that the ball needs to reach
     // This is visualized as a green circle on the maze
     _targetMarker.setRadius(Constants::TARGET_RADIUS);
@@ -284,7 +249,7 @@ void Maze::makeTarget(Ball& ball){
     _targetMarker.setPosition(_targetPosition);
 
     // Generate a path for the ball to follow
-    generatePath(ball);
+    generatePath();
 }
 
 /**
@@ -293,7 +258,7 @@ void Maze::makeTarget(Ball& ball){
  * Creates a sequence of points from the starting position to the target,
  * forming a path through the maze that avoids walls.
  */
-void Maze::generatePath(Ball& ball) {
+void Maze::generatePath() {
     // Clear any existing path
     _pathPoints.clear();
     _pathWaypoints.clear();
@@ -326,8 +291,6 @@ void Maze::generatePath(Ball& ball) {
         
         _pathWaypoints.push_back(Point3D(wpX, wpY, 0));
     }
-
-    ball.setPosition3D(_pathWaypoints[0]);
 
     // Add target as the final waypoint
     _pathWaypoints.push_back(_targetPosition3D);

@@ -6,8 +6,5 @@ int main() {
     Updater updater(img);
     updater.update();
 
-    UARTcom uart;
-    uart.sendmsg(0, 0);
-    uart.sendmsg(1, 0);
     return 0;
 }

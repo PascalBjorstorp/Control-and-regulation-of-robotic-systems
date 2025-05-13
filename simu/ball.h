@@ -39,6 +39,18 @@ public:
     void update(float tiltX, float tiltY);
 
     /**
+     * Checks for collisions between the ball and the maze walls.
+     * 
+     * This method detects collisions between the ball and outer walls.
+     * If a collision is detected, the ball's velocity is adjusted to simulate
+     * a bounce effect, and the method returns true to indicate a collision.
+     * 
+     * @param ball Reference to the ball object for collision detection
+     * @return True if a collision occurred, false otherwise
+     */
+    bool checkCollisions();
+
+    /**
      * Resets the ball to a specified position with zero velocity.
      * 
      * Used when restarting the game or after the ball falls into a hole.
@@ -50,9 +62,9 @@ public:
     void reset(float x, float y);
 
     // Getter functions
-    sf::CircleShape& getShape() { return shape; }
-    sf::Vector2f getVelocity() { return velocity; }
-    Point3D getPosition3D() { return position3D; }
+    const sf::CircleShape& getShape() const { return shape; }
+    const sf::Vector2f& getVelocity() const { return velocity; }
+    const Point3D& getPosition3D() const { return position3D; }
 
     // Setter functions
     void setVelocity(sf::Vector2f velocity) { this->velocity = velocity; }

@@ -81,3 +81,44 @@ void UARTcom::sendmsg(int motorSelect, float inputNumber) {
 
     write(_serial_port, &msg, sizeof(msg));
 }
+
+/**
+ * @brief Receives a single byte from UART and decodes it to motor and angle.
+ * @param[out] motorSelect 0 for motor 1, 1 for motor 2
+ * @param[out] angle       Angle in range [-5, 5]
+ * @return true if a byte was read, false otherwise
+ */
+/*
+bool UARTcom::receivemsg(int& motorSelect, float& angle) {
+    uint8_t msg = 0;
+    ssize_t bytesRead = read(_serial_port, &msg, 1);
+    if (bytesRead != 1) {
+        return false; // No data read
+    }
+
+    motorSelect = (msg & 0x80) ? 1 : 0; // MSB: 0 = motor 1, 1 = motor 2
+
+    uint8_t value = msg & 0x7F; // 7 LSB
+    // Map 0-127 to -5 to 5
+    angle = ((float)value / 127.0f) * 10.0f - 5.0f;
+
+    return true;
+}
+    */
+// Simulation of receiving a message
+bool receivemsg(int& motor, float& angle) {
+    static float t = 0;
+    t += 0.05f;
+    // Simulate a sine wave for X and Y angles
+    static bool toggle = false;
+    toggle = !toggle;
+    if (toggle) {
+        motor = 0; // X
+        angle = 10.0f * std::sin(t); // Simulate X tilt
+    } else {
+        motor = 1; // Y
+        angle = 10.0f * std::cos(t); // Simulate Y tilt
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(20)); // Simulate UART delay
+    return true;
+}

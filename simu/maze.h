@@ -108,18 +108,6 @@ public:
     void toggleAutoNavigation();
 
     /**
-     * Checks for collisions between the ball and the maze walls.
-     * 
-     * This method detects collisions between the ball and outer walls.
-     * If a collision is detected, the ball's velocity is adjusted to simulate
-     * a bounce effect, and the method returns true to indicate a collision.
-     * 
-     * @param ball Reference to the ball object for collision detection
-     * @return True if a collision occurred, false otherwise
-     */
-    bool checkCollisions(Ball& ball);
-
-    /**
      * Implements a PD (Proportional-Derivative) controller for automatic ball navigation.
      * 
      * This method automatically tilts the maze to guide the ball toward the target marker.
@@ -142,22 +130,26 @@ public:
      * This method generates a random target position within the maze bounds
      * and projects it to 3D space for proper perspective projection.
      */
-    void makeTarget(Ball &ball);
-    void generatePath(Ball& ball);
+    void makeTarget();
+    void generatePath();
     void createPathVisuals();
     void updatePathProjection();
 
     // Getter functions
-    bool getAutoNavigationEnabled() { return _autoNavigationEnabled; }
-    std::vector<Wall>& getWalls() { return _walls; }
-    sf::ConvexShape& getBackground() { return _background; }
-    sf::CircleShape& getTargetMarker() { return _targetMarker; }
-    sf::Vector2f getTargetPosition() { return _targetPosition; }
-    Point3D getTargetPosition3D() { return _targetPosition3D; }
-    float getTiltX() { return _tiltX; }
-    float getTiltY() { return _tiltY; }
+    bool getAutoNavigationEnabled() const { return _autoNavigationEnabled; }
+    std::vector<Wall>& getWalls() const { return _walls; }
+    sf::ConvexShape& getBackground() const { return _background; }
+    sf::CircleShape& getTargetMarker() const { return _targetMarker; }
+    sf::Vector2f getTargetPosition() const { return _targetPosition; }
+    Point3D getTargetPosition3D() const { return _targetPosition3D; }
+    float getTiltX() const { return _tiltX; }
+    float getTiltY() const { return _tiltY; }
     const sf::VertexArray& getPath() const { return _pathPoints; }
     const std::vector<sf::CircleShape>& getWaypointMarkers() const { return _waypointMarkers; }
+
+    // Setter functions
+    void setTiltX(float tiltX) { _tiltX = tiltX; }
+    void setTiltY(float tiltY) { _tiltY = tiltY; }
 };
 
 #endif // MAZE_H

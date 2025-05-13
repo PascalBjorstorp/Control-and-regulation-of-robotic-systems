@@ -41,6 +41,44 @@ void Ball::update(float tiltX, float tiltY) {
     // Apply scaling based on z position for depth effect
     float scale = Constants::FOCAL_LENGTH / (Constants::FOCAL_LENGTH + rotatedPosition._z);
     shape.setScale(scale, scale);
+
+    checkCollisions();
+}
+
+bool Ball::checkCollisions() {
+    // Create a copy of the ball's 3D position and velocity
+    Point3D ballPos = getPosition3D();
+    sf::Vector2f ballVel = getVelocity();
+
+    // Check if ball goes out of bounds
+    float mazeWidth = Constants::WALL_LENGTH;
+    float mazeHeight = Constants::WALL_LENGTH;
+
+    // Checks if the ball is outside the maze bounds
+    if (std::abs(ballPos._x) > mazeWidth / 2 - Constants::BALL_RADIUS ||
+        std::abs(ballPos._y) > mazeHeight / 2 - Constants::BALL_RADIUS) {
+
+        // Bounce off the edge in the x-direction
+        if (std::abs(ballPos._x) > mazeWidth / 2 - Constants::BALL_RADIUS) {
+            float newVelx = ballVel.x * -0.5f;
+            velocity = (sf::Vector2f(newVelx, ballVel.y));
+
+            float newX = (mazeWidth / 2 - Constants::BALL_RADIUS) * (ballPos._x > 0 ? 1 : -1);
+            position3D = (Point3D(newX, ballPos._y, ballPos._z));
+        }
+
+        // Bounce off the edge in the y-direction
+        if (std::abs(ballPos._y) > mazeHeight / 2 - Constants::BALL_RADIUS) {
+            float newVely = ballVel.y * -0.5f;
+            velocity = (sf::Vector2f(ballVel.x, newVely));
+
+            float newY = (mazeHeight / 2 - Constants::BALL_RADIUS) * (ballPos._y > 0 ? 1 : -1);
+            position3D = (Point3D(ballPos._x, newY, ballPos._z));
+        }
+        return true;
+    }
+
+    return false;
 }
 
 void Ball::reset(float x, float y) {
