@@ -17,6 +17,7 @@
 #include "maze.h"
 #include "wall.h"
 #include "uartcom.h"
+#include "ballDetector.h"
 
 class Updater
 {

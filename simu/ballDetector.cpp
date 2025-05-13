@@ -1,4 +1,4 @@
-#include "balldetector.h"
+#include "ballDetector.h"
 #include <limits>
 #include <algorithm>
 
@@ -6,6 +6,7 @@ BallDetector::BallDetector(const std::string& device_) : device(device_) {}
 
 bool BallDetector::getBallPosition(float& x, float& y) {
     std::lock_guard<std::mutex> lock(posMutex);
+    if(!hasBall) return false;
     x = _ballX;
     y = _ballY;
     return true;
@@ -18,7 +19,10 @@ void BallDetector::detectionLoop() {
     cv::Mat img, blue_img;
     while (running) {
         cap >> img;
-        if (img.empty()) continue;
+        if (img.empty()){
+            std::cerr << "Failed to capture image" << std::endl;
+            continue;
+        }
 
         cv::Mat hsv;
         cv::cvtColor(img, hsv, cv::COLOR_BGR2HSV);
@@ -50,8 +54,13 @@ void BallDetector::detectionLoop() {
             std::lock_guard<std::mutex> lock(posMutex);
             _ballX = cx;
             _ballY = cy;
+            hasBall = true;
+        } else {
+            std::lock_guard<std::mutex> lock(posMutex);
+            hasBall = false;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 

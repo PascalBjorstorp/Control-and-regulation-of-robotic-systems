@@ -137,9 +137,9 @@ public:
 
     // Getter functions
     bool getAutoNavigationEnabled() const { return _autoNavigationEnabled; }
-    std::vector<Wall>& getWalls() const { return _walls; }
-    sf::ConvexShape& getBackground() const { return _background; }
-    sf::CircleShape& getTargetMarker() const { return _targetMarker; }
+    std::vector<Wall>& getWalls() { return _walls; }
+    sf::ConvexShape& getBackground() { return _background; }
+    sf::CircleShape& getTargetMarker() { return _targetMarker; }
     sf::Vector2f getTargetPosition() const { return _targetPosition; }
     Point3D getTargetPosition3D() const { return _targetPosition3D; }
     float getTiltX() const { return _tiltX; }

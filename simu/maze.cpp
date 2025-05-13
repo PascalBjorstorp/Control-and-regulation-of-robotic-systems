@@ -110,7 +110,7 @@ void Maze::updateAutoNavigation(Ball& ball) {
 
     // Check if there are any waypoints
     if (_pathWaypoints.empty()) {
-        makeTarget(ball);
+        makeTarget();
         return;
     }
 
@@ -138,7 +138,7 @@ void Maze::updateAutoNavigation(Ball& ball) {
             currentTarget = _pathWaypoints[_currentWaypointIndex];
         } else {
             // Optionally generate a new target if the final waypoint is reached.
-            makeTarget(ball);
+            makeTarget();
             return;
         }
         // Update rotated target and targetPos after switching waypoints.

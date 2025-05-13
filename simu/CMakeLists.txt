@@ -28,4 +28,4 @@ add_executable(BallMazeGame main.cpp
 )
 
 # Link SFML libraries
-target_link_libraries(BallMazeGame PRIVATE sfml-graphics sfml-window sfml-system ${OpenCV_LIBS} opencv_core opencv_imgproc OpenMP::OpenMP_CXX)
+target_link_libraries(BallMazeGame PRIVATE sfml-graphics sfml-window sfml-system ${OpenCV_LIBS} opencv_core opencv_imgproc)

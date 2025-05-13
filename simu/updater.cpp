@@ -1,8 +1,10 @@
 #include "updater.h"
 
 Updater::Updater(cv::Mat img)
-: _window(sf::VideoMode(Constants::WINDOW_WIDTH, Constants::WINDOW_HEIGHT), "Maze Game"), 
-  _ball(Constants::WINDOW_WIDTH / 4, Constants::WINDOW_HEIGHT / 4), _maze(img) {
+: _window(sf::VideoMode(Constants::WINDOW_WIDTH, Constants::WINDOW_HEIGHT), "Maze Game"),
+  _ball(Constants::WINDOW_WIDTH / 4, Constants::WINDOW_HEIGHT / 4),
+    _maze(img),
+    _ballDetector("/dev/video0"){
     
     _window.setFramerateLimit(60);
 
@@ -22,7 +24,8 @@ Updater::Updater(cv::Mat img)
     cameraThread = std::thread(&Updater::cameraUpdate, this);
     angleTX = std::thread(&Updater::sendAngle, this);
     physicsThread = std::thread(&Updater::physicsUpdate, this);
-    ballDetect = std::thread(&_ballDetector::detectionLoop, &_ballDetector);
+    _ballDetector.running = true;
+    ballDetect = std::thread(&BallDetector::detectionLoop, &_ballDetector);
 }
 
 Updater::~Updater() {
@@ -135,7 +138,7 @@ void Updater::cameraUpdate() {
             newDataAvailable = true;
             dataCondVar.notify_one(); // Move inside the if-block
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 

@@ -25,6 +25,7 @@ private:
 public:
     UARTcom();
     uint8_t convertFloatToMsg(int motorSelect, float inputNumber);
+    bool receivemsg(int& motor, float& angle);
     void sendmsg(int motorSelect, float inputNumber);
 };
 #endif // UARTCOM_H

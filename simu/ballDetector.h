@@ -8,20 +8,17 @@
 
 class BallDetector {
 private:
-    void detectionLoop();
-    void outerPoints(const cv::Mat& img, int startRow, int startCol, int endRow, int endCol, std::vector<int>& locations);
-
-    std::atomic<bool> running{false};
     std::mutex posMutex;
     float _ballX = 0.0f, _ballY = 0.0f;
     std::string device;
+    bool hasBall = false;
 
 public:
+    std::atomic<bool> running{false};
     BallDetector(const std::string& device = "/dev/video0");
-    ~BallDetector();
     void detectionLoop();
     bool getBallPosition(float& x, float& y);
-    void getOuterPoints(const cv::Mat& img, int startRow, int startCol, int endRow, int endCol, std::vector<int>& locations);
+    void outerPoints(const cv::Mat& img, int startRow, int startCol, int endRow, int endCol, std::vector<int>& locations);
 };
 
 #endif // BALL_DETECTOR_H

@@ -2,6 +2,7 @@
 #include <bitset>
 #include <cmath>
 #include <iostream>
+#include <thread>
 
 UARTcom::UARTcom() {
     _serial_port = open("/dev/ttyACM0", O_RDWR);                     // Her åbner vi serie port forbindelsen
@@ -106,18 +107,18 @@ bool UARTcom::receivemsg(int& motorSelect, float& angle) {
 }
     */
 // Simulation of receiving a message
-bool receivemsg(int& motor, float& angle) {
+bool UARTcom::receivemsg(int& motor, float& angle) {
     static float t = 0;
-    t += 0.05f;
+    t += 0.03f;
     // Simulate a sine wave for X and Y angles
     static bool toggle = false;
     toggle = !toggle;
     if (toggle) {
         motor = 0; // X
-        angle = 10.0f * std::sin(t); // Simulate X tilt
+        angle = 1.0f * std::sin(t); // Simulate X tilt
     } else {
         motor = 1; // Y
-        angle = 10.0f * std::cos(t); // Simulate Y tilt
+        angle = 1.0f * std::cos(t); // Simulate Y tilt
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(20)); // Simulate UART delay
     return true;
