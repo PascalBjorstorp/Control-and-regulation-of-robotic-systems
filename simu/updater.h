@@ -27,7 +27,7 @@ public:
      * Initializes the window, font, text, ball, and maze objects.
      * Sets the window framerate limit to 60 FPS.
      */
-    Updater();
+    Updater(cv::Mat img);
 
     /**
      * Main update loop for the game.

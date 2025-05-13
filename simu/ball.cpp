@@ -25,7 +25,6 @@ void Ball::update(float tiltX, float tiltY) {
 
     // Apply acceleration and friction
     velocity += acceleration;
-    velocity *= Constants::FRICTION;
 
     // Update 3D position (z remains 0 as ball stays on the surface)
     position3D._x += velocity.x;

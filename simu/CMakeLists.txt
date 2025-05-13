@@ -22,6 +22,7 @@ add_executable(BallMazeGame main.cpp
     imagehandler.h imagehandler.cpp
     linedetecter.h linedetecter.cpp
     Constants.h
+    uartcom.h uartcom.cpp
 )
 
 # Link SFML libraries

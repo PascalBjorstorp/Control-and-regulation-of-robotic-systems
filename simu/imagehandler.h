@@ -8,7 +8,8 @@
 
 class imageHandler
 {
-    cv::Mat _img, _red_img, _blue_img, output;
+    cv::Mat _img, _red_img, _blue_img, _green_img;
+    int _threshhold = 127;
     std::vector<cv::Vec3f> _SS_points;
 
 public:
@@ -16,6 +17,7 @@ public:
 
     void isolate_red();
     void isolate_blue();
+    void isolate_green();
     void detect_SS(cv::Mat *img);
     void rmv_SS();
     void perform_skeletonization();

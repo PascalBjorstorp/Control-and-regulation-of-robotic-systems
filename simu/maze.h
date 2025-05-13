@@ -7,6 +7,7 @@
 #include "wall.h"
 #include "motor.h"
 #include "Constants.h"
+#include "uartcom.h"
 #include <SFML/Graphics.hpp>
 #include <vector>
 
@@ -15,13 +16,14 @@ class Maze : public lineDetecter{
     std::vector<Wall> _walls;
     sf::ConvexShape _background;
     std::vector<Point3D> _backgroundCorners3D;
+    UARTcom uart;
 
     // Target variables
     sf::CircleShape _targetMarker;
     sf::Vector2f _targetPosition;
     Point3D _targetPosition3D;
 
-    bool _autoNavigationEnabled = true;
+    bool _autoNavigationEnabled = false;
     float _tiltX = 0.f;
     float _tiltY = 0.f;
 
@@ -31,7 +33,7 @@ class Maze : public lineDetecter{
     std::vector<Point3D> _pathWaypoints;
     std::vector<sf::CircleShape> _waypointMarkers;
     sf::VertexArray _pathPoints;
-    size_t _currentWaypointIndex;
+    size_t _currentWaypointIndex = 0;
 
     // Motors for the tilt system
     Motor _motorX;  // Controls tilt around X axis
@@ -47,8 +49,8 @@ class Maze : public lineDetecter{
     float _lastDesiredTiltY = 0.0f;
 
     // PD controller constants
-    const float _kp = 0.8f;           // Proportional gain
-    const float _kd = 1.2f;           // Derivative gain    
+    const float _kp = 3.f;           // Proportional gain
+    const float _kd = 3.f;           // Derivative gain
 
 public:
 
@@ -61,7 +63,7 @@ public:
      * 3. The target marker that the ball needs to reach
      * 4. All maze walls and their initial positions
      */
-    Maze();
+    Maze(cv::Mat img);
 
     /**
      * Creates the walls that form the maze layout.
@@ -156,8 +158,6 @@ public:
     float getTiltY() { return _tiltY; }
     const sf::VertexArray& getPath() const { return _pathPoints; }
     const std::vector<sf::CircleShape>& getWaypointMarkers() const { return _waypointMarkers; }
-    float getMotorXSpeed() const { return _motorX.getCurrentSpeed(); }
-    float getMotorYSpeed() const { return _motorY.getCurrentSpeed(); }
 };
 
 #endif // MAZE_H

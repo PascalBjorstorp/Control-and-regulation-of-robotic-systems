@@ -2,16 +2,16 @@
 
 imageHandler::imageHandler(cv::Mat img):_img(img)
 {
-    isolate_red();
+    cv::Mat normalImg = img;
+    isolate_green();
     isolate_blue();
-    detect_SS(&_blue_img);
+    isolate_red();
+    detect_SS(&_green_img);
     detect_SS(&_red_img);
     rmv_SS();
-    cv::cvtColor(_img, _img, cv::COLOR_BGR2GRAY);
+    cvtColor(_img, _img, cv::COLOR_BGR2GRAY);
     perform_skeletonization();
     perform_dilate();
-    cv::cvtColor(_img, output, cv::COLOR_GRAY2BGR);
-
 }
 
 void imageHandler::isolate_red(){
@@ -28,19 +28,27 @@ void imageHandler::isolate_red(){
 void imageHandler::isolate_blue(){
     cv::Mat hsv;
 
-    cvtColor(_img, hsv, cv::COLOR_BGR2HSV);
+    cv::cvtColor(_img, hsv, cv::COLOR_BGR2HSV);
 
     cv::inRange(hsv, cv::Scalar(100, 150, 50), cv::Scalar(140, 255, 255), _blue_img);
 }
 
+void imageHandler::isolate_green(){
+    cv::Mat hsv;
+
+    cvtColor(_img, hsv, cv::COLOR_BGR2HSV);
+
+    inRange(hsv, cv::Scalar(35, 100, 50), cv::Scalar(85, 255, 255), _green_img);
+}
+
 void imageHandler::detect_SS(cv::Mat *img){
     cv::Mat temp;
-    cv::Vec3f fin_circ(0, 0, 0);
+    cv::Vec3f fin_circ;
     std::vector<cv::Vec3f> temp_circ;
 
-    cv::GaussianBlur(*img, temp, cv::Size(9, 9), 2, 2);
+    GaussianBlur(*img, temp, cv::Size(9, 9), 2, 2);
 
-    cv::HoughCircles(temp, temp_circ, cv::HOUGH_GRADIENT, 1, 1, 100, 30, 0, 0);
+    HoughCircles(temp, temp_circ, cv::HOUGH_GRADIENT, 1, 1, 100, 30, 0, 0);
 
     for(int i = 0; i < temp_circ.size(); i++){
         if(temp_circ[i][2] > fin_circ[2]){
@@ -58,7 +66,7 @@ void imageHandler::rmv_SS(){
 }
 
 void imageHandler::perform_skeletonization(){
-    threshold(_img, _img, 145, 255, cv::THRESH_BINARY_INV);
+    threshold(_img, _img, _threshhold, 255, cv::THRESH_BINARY_INV);
 
     //Declare variables with correct color channels - 8 bit 1 color
     cv::Mat skel(cv::Mat::zeros(_img.size(), CV_8UC1)), temp(cv::Mat::zeros(_img.size(), CV_8UC1)), eroded(cv::Mat::zeros(_img.size(), CV_8UC1));

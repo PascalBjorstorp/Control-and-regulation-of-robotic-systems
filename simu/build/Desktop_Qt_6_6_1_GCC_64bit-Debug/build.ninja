@@ -112,6 +112,13 @@ build CMakeFiles/BallMazeGame.dir/linedetecter.cpp.o: CXX_COMPILER__BallMazeGame
   OBJECT_DIR = CMakeFiles/BallMazeGame.dir
   OBJECT_FILE_DIR = CMakeFiles/BallMazeGame.dir
 
+build CMakeFiles/BallMazeGame.dir/uartcom.cpp.o: CXX_COMPILER__BallMazeGame_Debug /home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/uartcom.cpp || cmake_object_order_depends_target_BallMazeGame
+  DEP_FILE = CMakeFiles/BallMazeGame.dir/uartcom.cpp.o.d
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17
+  INCLUDES = -isystem /usr/local/include/opencv4
+  OBJECT_DIR = CMakeFiles/BallMazeGame.dir
+  OBJECT_FILE_DIR = CMakeFiles/BallMazeGame.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target BallMazeGame
@@ -120,7 +127,7 @@ build CMakeFiles/BallMazeGame.dir/linedetecter.cpp.o: CXX_COMPILER__BallMazeGame
 #############################################
 # Link the executable BallMazeGame
 
-build BallMazeGame: CXX_EXECUTABLE_LINKER__BallMazeGame_Debug CMakeFiles/BallMazeGame.dir/main.cpp.o CMakeFiles/BallMazeGame.dir/ball.cpp.o CMakeFiles/BallMazeGame.dir/wall.cpp.o CMakeFiles/BallMazeGame.dir/point3d.cpp.o CMakeFiles/BallMazeGame.dir/maze.cpp.o CMakeFiles/BallMazeGame.dir/motor.cpp.o CMakeFiles/BallMazeGame.dir/updater.cpp.o CMakeFiles/BallMazeGame.dir/imagehandler.cpp.o CMakeFiles/BallMazeGame.dir/linedetecter.cpp.o | /usr/lib/x86_64-linux-gnu/libsfml-graphics.so.2.5.1 /usr/lib/x86_64-linux-gnu/libsfml-window.so.2.5.1 /usr/lib/x86_64-linux-gnu/libsfml-system.so.2.5.1 /usr/local/lib/libopencv_gapi.so.4.12.0 /usr/local/lib/libopencv_highgui.so.4.12.0 /usr/local/lib/libopencv_ml.so.4.12.0 /usr/local/lib/libopencv_objdetect.so.4.12.0 /usr/local/lib/libopencv_photo.so.4.12.0 /usr/local/lib/libopencv_stitching.so.4.12.0 /usr/local/lib/libopencv_video.so.4.12.0 /usr/local/lib/libopencv_videoio.so.4.12.0 /usr/local/lib/libopencv_imgcodecs.so.4.12.0 /usr/local/lib/libopencv_dnn.so.4.12.0 /usr/local/lib/libopencv_calib3d.so.4.12.0 /usr/local/lib/libopencv_features2d.so.4.12.0 /usr/local/lib/libopencv_flann.so.4.12.0 /usr/local/lib/libopencv_imgproc.so.4.12.0 /usr/local/lib/libopencv_core.so.4.12.0
+build BallMazeGame: CXX_EXECUTABLE_LINKER__BallMazeGame_Debug CMakeFiles/BallMazeGame.dir/main.cpp.o CMakeFiles/BallMazeGame.dir/ball.cpp.o CMakeFiles/BallMazeGame.dir/wall.cpp.o CMakeFiles/BallMazeGame.dir/point3d.cpp.o CMakeFiles/BallMazeGame.dir/maze.cpp.o CMakeFiles/BallMazeGame.dir/motor.cpp.o CMakeFiles/BallMazeGame.dir/updater.cpp.o CMakeFiles/BallMazeGame.dir/imagehandler.cpp.o CMakeFiles/BallMazeGame.dir/linedetecter.cpp.o CMakeFiles/BallMazeGame.dir/uartcom.cpp.o | /usr/lib/x86_64-linux-gnu/libsfml-graphics.so.2.5.1 /usr/lib/x86_64-linux-gnu/libsfml-window.so.2.5.1 /usr/lib/x86_64-linux-gnu/libsfml-system.so.2.5.1 /usr/local/lib/libopencv_gapi.so.4.12.0 /usr/local/lib/libopencv_highgui.so.4.12.0 /usr/local/lib/libopencv_ml.so.4.12.0 /usr/local/lib/libopencv_objdetect.so.4.12.0 /usr/local/lib/libopencv_photo.so.4.12.0 /usr/local/lib/libopencv_stitching.so.4.12.0 /usr/local/lib/libopencv_video.so.4.12.0 /usr/local/lib/libopencv_videoio.so.4.12.0 /usr/local/lib/libopencv_imgcodecs.so.4.12.0 /usr/local/lib/libopencv_dnn.so.4.12.0 /usr/local/lib/libopencv_calib3d.so.4.12.0 /usr/local/lib/libopencv_features2d.so.4.12.0 /usr/local/lib/libopencv_flann.so.4.12.0 /usr/local/lib/libopencv_imgproc.so.4.12.0 /usr/local/lib/libopencv_core.so.4.12.0
   FLAGS = -DQT_QML_DEBUG -g
   LINK_LIBRARIES = -Wl,-rpath,/usr/local/lib  /usr/lib/x86_64-linux-gnu/libsfml-graphics.so.2.5.1  /usr/lib/x86_64-linux-gnu/libsfml-window.so.2.5.1  /usr/lib/x86_64-linux-gnu/libsfml-system.so.2.5.1  /usr/local/lib/libopencv_gapi.so.4.12.0  /usr/local/lib/libopencv_highgui.so.4.12.0  /usr/local/lib/libopencv_ml.so.4.12.0  /usr/local/lib/libopencv_objdetect.so.4.12.0  /usr/local/lib/libopencv_photo.so.4.12.0  /usr/local/lib/libopencv_stitching.so.4.12.0  /usr/local/lib/libopencv_video.so.4.12.0  /usr/local/lib/libopencv_videoio.so.4.12.0  /usr/local/lib/libopencv_imgcodecs.so.4.12.0  /usr/local/lib/libopencv_dnn.so.4.12.0  /usr/local/lib/libopencv_calib3d.so.4.12.0  /usr/local/lib/libopencv_features2d.so.4.12.0  /usr/local/lib/libopencv_flann.so.4.12.0  /usr/local/lib/libopencv_imgproc.so.4.12.0  /usr/local/lib/libopencv_core.so.4.12.0
   OBJECT_DIR = CMakeFiles/BallMazeGame.dir

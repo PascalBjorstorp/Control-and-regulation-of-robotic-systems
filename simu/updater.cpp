@@ -1,6 +1,6 @@
 #include "updater.h"
 
-Updater::Updater(): _window(sf::VideoMode(Constants::WINDOW_WIDTH, Constants::WINDOW_HEIGHT), "Maze Game"), _ball(Constants::WINDOW_WIDTH / 4, Constants::WINDOW_HEIGHT / 4) {
+Updater::Updater(cv::Mat img): _window(sf::VideoMode(Constants::WINDOW_WIDTH, Constants::WINDOW_HEIGHT), "Maze Game"), _ball(Constants::WINDOW_WIDTH / 4, Constants::WINDOW_HEIGHT / 4), _maze(img) {
     _window.setFramerateLimit(60);
 
     if (!_font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")) {
@@ -46,8 +46,6 @@ void Updater::update(){
         std::stringstream ss;
         ss << "X Tilt: " << std::fixed << std::setprecision(1) << _maze.getTiltX()
            << "\nY Tilt: " << std::fixed << std::setprecision(1) << _maze.getTiltY()
-           << "\nX Motor Speed: " << std::fixed << std::setprecision(1) << _maze.getMotorXSpeed() 
-           << "\nY Motor Speed: " << std::fixed << std::setprecision(1) << _maze.getMotorYSpeed()
            << "\nVelocity x: " << std::fixed << std::setprecision(1) << _ball.getVelocity().x
            << "\nVelocity y: " << std::fixed << std::setprecision(1) << _ball.getVelocity().y
            << "\nAuto: " << (_maze.getAutoNavigationEnabled() ? "On" : "Off");

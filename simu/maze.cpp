@@ -1,7 +1,7 @@
 #include "maze.h"
 #include <iostream>
 
-Maze::Maze() {
+Maze::Maze(cv::Mat img) : lineDetecter(img) {
     // Setup the background plane as a rectangular convex shape
     // This represents the flat surface of the maze that will be tilted in 3D space
     _background.setPointCount(4);
@@ -10,8 +10,8 @@ Maze::Maze() {
     // Define the corners of the maze in 3D space
     // The maze is centered at (0,0,0) with dimensions slightly smaller than the window
     // This allows the maze to be fully visible when tilted
-    float mazeWidth = Constants::WINDOW_WIDTH - 200;
-    float mazeHeight = Constants::WINDOW_HEIGHT - 200;
+    float mazeWidth = Constants::WALL_LENGTH;
+    float mazeHeight = Constants::WALL_LENGTH;
     
     _backgroundCorners3D = {
         Point3D(-mazeWidth/2, -mazeHeight/2, 0),  // Top-left
@@ -35,32 +35,20 @@ void Maze::createMaze() {
     // Parameters for Wall constructor: (x, y, length, isHorizontal)
     
     // Top horizontal border (slightly offset to properly connect with vertical borders)
-    _walls.push_back(Wall(95, 100, Constants::WINDOW_WIDTH - 190, true));
+    _walls.push_back(Wall(Constants::WALL_X + 5, Constants::WALL_Y + 5, Constants::WALL_LENGTH + 10, true));
     
     // Left vertical border
-    _walls.push_back(Wall(100, 95, Constants::WINDOW_HEIGHT - 190, false));
+    _walls.push_back(Wall(Constants::WALL_X + 5, Constants::WALL_Y, Constants::WALL_LENGTH + 15, false));
     
     // Bottom horizontal border
-    _walls.push_back(Wall(100, Constants::WINDOW_HEIGHT - 100, Constants::WINDOW_WIDTH - 195, true));
+    _walls.push_back(Wall(Constants::WALL_X + 5, Constants::WALL_LENGTH + Constants::WALL_Y + 10, Constants::WALL_LENGTH + 10, true));
     
     // Right vertical border
-    _walls.push_back(Wall(Constants::WINDOW_WIDTH - 100, 100, Constants::WINDOW_HEIGHT - 195, false));
+    _walls.push_back(Wall(Constants::WALL_LENGTH + Constants::WALL_X + 10, Constants::WALL_Y + 10, Constants::WALL_LENGTH, false));
 }
 
 
-void Maze::updateTilt() {
-    // Calculate time since last update
-    float currentTime = _motorClock.getElapsedTime().asSeconds();
-    float deltaTime = currentTime - _lastUpdateTime;
-    _lastUpdateTime = currentTime;
-    
-    // Ensure reasonable delta time (in case of debugging pauses)
-    if (deltaTime > 0.1f) deltaTime = 0.016f; // cap at ~60fps
-    
-    // Calculate target tilt based on key inputs
-    float targetTiltX = _motorX.getCurrentPosition();
-    float targetTiltY = _motorY.getCurrentPosition();
-    
+void Maze::updateTilt() {  
     // Calculate input based on keyboard state
     // Note: The motors have momentum now, so we're adjusting target positions
     const float angleChangeRate = Constants::TILT_SPEED * 10.0f; // Degrees per second
@@ -76,22 +64,6 @@ void Maze::updateTilt() {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))  _tiltX -= Constants::TILT_SPEED/2;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))  _tiltY -= Constants::TILT_SPEED/2;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))  _tiltY += Constants::TILT_SPEED/2;
-
-    // Clamp target angles to prevent excessive tilting
-    targetTiltX = std::clamp(targetTiltX, -Constants::MAX_TILT_ANGLE, Constants::MAX_TILT_ANGLE);
-    targetTiltY = std::clamp(targetTiltY, -Constants::MAX_TILT_ANGLE, Constants::MAX_TILT_ANGLE);
-    
-    // Update motor target positions
-    _motorX.setTargetPosition(targetTiltX);
-    _motorY.setTargetPosition(targetTiltY);
-    
-    // Update motor physics
-    _motorX.update(deltaTime);
-    _motorY.update(deltaTime);
-    
-    // Get actual tilt angles from motors
-    _tiltX = _motorX.getCurrentPosition();
-    _tiltY = _motorY.getCurrentPosition();
     
     // Update the visual projection based on new tilt angles
     updateProjection();
@@ -165,78 +137,114 @@ bool Maze::checkCollisions(Ball& ball) {
     return false;
 }
 
-// To be fine tuned later
 void Maze::updateAutoNavigation(Ball& ball) {
     if (!_autoNavigationEnabled) return;
 
     float currentTime = _motorClock.getElapsedTime().asSeconds();
-    float deltaTime = currentTime - _lastUpdateTime;
-    _lastUpdateTime = currentTime;
-
     float timeSinceControlUpdate = currentTime - _lastControlUpdateTime;
 
-    if (timeSinceControlUpdate >= 0.05f) {
-        _lastControlUpdateTime = currentTime;
+    // Check if there are any waypoints
+    if (_pathWaypoints.empty()) {
+        makeTarget(ball);
+        return;
+    }
 
-        Point3D currentTarget;
-        if (_pathWaypoints.size() >= 2) {
-            currentTarget = _pathWaypoints[1];
+    // Use _currentWaypointIndex to track the active waypoint.
+    Point3D currentTarget = _pathWaypoints[_currentWaypointIndex];
+
+    // Rotate and project the target
+    Point3D rotatedTarget = currentTarget;
+    rotatedTarget.rotate(_tiltX, _tiltY);
+    sf::Vector2f targetPos = rotatedTarget.project();
+
+    // Get the ball's current position and velocity.
+    sf::Vector2f ballPos = ball.getShape().getPosition();
+    sf::Vector2f ballVel = ball.getVelocity();
+
+    // Compute position error and distance.
+    sf::Vector2f positionError = targetPos - ballPos;
+    float distanceToTarget = std::sqrt(positionError.x * positionError.x + positionError.y * positionError.y);
+
+    // If the ball is close enough to the current waypoint, move to the next waypoint.
+    const float waypointThreshold = 5.0f; // adjust as needed (in pixels)
+    if (distanceToTarget < waypointThreshold) {
+        if (_currentWaypointIndex < _pathWaypoints.size() - 1) {
+            _currentWaypointIndex++; // Proceed to next waypoint
+            currentTarget = _pathWaypoints[_currentWaypointIndex];
         } else {
+            // Optionally generate a new target if the final waypoint is reached.
             makeTarget(ball);
             return;
         }
-
-        Point3D rotatedTarget = currentTarget;
+        // Update rotated target and targetPos after switching waypoints.
+        rotatedTarget = currentTarget;
         rotatedTarget.rotate(_tiltX, _tiltY);
-        sf::Vector2f targetPos = rotatedTarget.project();
-
-        sf::Vector2f ballPos = ball.getShape().getPosition();
-        sf::Vector2f ballVel = ball.getVelocity();
-
-        sf::Vector2f positionError = targetPos - ballPos;
-        float distanceToTarget = std::sqrt(positionError.x * positionError.x + positionError.y * positionError.y);
-
-        sf::Vector2f normalizedPosError(0, 0);
-        if (distanceToTarget > 0) {
-            normalizedPosError = positionError / distanceToTarget;
-        }
-
-        float ballSpeed = std::sqrt(ballVel.x * ballVel.x + ballVel.y * ballVel.y);
-
-        // Fixed PD gains for stable control
-        float proportionalGain = 0.4f;  // Proportional gain
-        float derivativeGain = 0.08f;      // Derivative gain
-
-        // Calculate control terms
-        // For X tilt (affects Y movement)
-        float propTiltX = proportionalGain * normalizedPosError.y; 
-        float derivTiltX = -derivativeGain * ballVel.y;
-        
-        // For Y tilt (affects X movement)
-        float propTiltY = -proportionalGain * normalizedPosError.x;
-        float derivTiltY = derivativeGain * ballVel.x;
-        
-        // Calculate desired tilt with smooth blending
-        float desiredTiltX = propTiltX + derivTiltX;
-        float desiredTiltY = propTiltY + derivTiltY;
-        
-        // Apply tilt angle limits
-        float maxTiltAngle = 2.f;
-        desiredTiltX = std::clamp(desiredTiltX, -maxTiltAngle, maxTiltAngle);
-        desiredTiltY = std::clamp(desiredTiltY, -maxTiltAngle, maxTiltAngle);
-        
-        // Apply smoother transitions with exponential smoothing
-        _lastDesiredTiltX = desiredTiltX;
-        _lastDesiredTiltY = desiredTiltY;     
+        targetPos = rotatedTarget.project();
+        positionError = targetPos - ballPos;
+        distanceToTarget = std::sqrt(positionError.x * positionError.x + positionError.y * positionError.y);
     }
 
-    _motorX.setTargetPosition(_lastDesiredTiltX);
-    _motorY.setTargetPosition(_lastDesiredTiltY);
-    _motorX.update(deltaTime);
-    _motorY.update(deltaTime);
+    // Normalize the error for PD control.
+    sf::Vector2f normalizedPosError(0, 0);
+    if (distanceToTarget > 0)
+        normalizedPosError = positionError / distanceToTarget;
 
-    _tiltX = _motorX.getCurrentPosition();
-    _tiltY = _motorY.getCurrentPosition();
+    // Use fixed PD gains (from class members _kp and _kd).
+    float proportionalGain = _kp;
+    float derivativeGain = _kd;
+
+    // Calculate control terms for tilt.
+    float propTiltX = proportionalGain * normalizedPosError.y;
+    float derivTiltX = -derivativeGain * ballVel.y;
+
+    float propTiltY = -proportionalGain * normalizedPosError.x;
+    float derivTiltY = derivativeGain * ballVel.x;
+
+    // Compute desired tilt in board coordinates.
+    float desiredTiltX = propTiltX + derivTiltX;
+    float desiredTiltY = propTiltY + derivTiltY;
+
+    // Apply tilt angle limits (in board coordinates).
+    float maxTiltAngle = 5.f;
+    desiredTiltX = std::clamp(desiredTiltX, -maxTiltAngle, maxTiltAngle);
+    desiredTiltY = std::clamp(desiredTiltY, -maxTiltAngle, maxTiltAngle);
+
+    // Apply gearing: motor target = board target * gearRatio.
+    const float gearRatio = 3.0f;
+    _motorX.setTargetPosition(desiredTiltX * gearRatio);
+    _motorY.setTargetPosition(desiredTiltY * gearRatio);
+
+    if (timeSinceControlUpdate >= 0.01f) {
+        _lastControlUpdateTime = currentTime;
+        // Compute the control signal (voltage) and update motor states.
+        float controlVoltageX = _motorX.compute(timeSinceControlUpdate);
+        float controlVoltageY = _motorY.compute(timeSinceControlUpdate);
+        _motorX.update(timeSinceControlUpdate);
+        _motorY.update(timeSinceControlUpdate);
+
+        std::cout << "time since: " << timeSinceControlUpdate << " s" << std::endl;
+
+        uart.sendmsg(0, controlVoltageX);
+        uart.sendmsg(1, controlVoltageY);
+
+        // When printing, convert motor position back to board tilt.
+        float boardTiltX = _motorX.getPosition() / gearRatio;
+        float boardTiltY = _motorY.getPosition() / gearRatio;
+
+        /*std::cout << "Time: " << deltaTime << " s, Board Tilt X: "
+                  << boardTiltX << " rad, Motor Speed: "
+                  << _motorX.getOmega() << " rad/s, Voltage: "
+                  << controlVoltageX << " V" << std::endl;
+*/
+        /*std::cout << "Time: " << deltaTime << " s, Board Tilt Y: "
+                  << boardTiltY << " rad, Motor Speed: "
+                  << _motorY.getOmega() << " rad/s, Voltage: "
+                  << controlVoltageY << " V" << std::endl;
+*/
+        // Update the tilt angles for projection.
+        _tiltX = boardTiltX;
+        _tiltY = boardTiltY;
+    }
 
     updateProjection();
 }
@@ -252,8 +260,8 @@ void Maze::makeTarget(Ball& ball){
     float imgWidth = get_img().cols;
     float imgHeight = get_img().rows;
 
-    float mazeWidth = Constants::WINDOW_WIDTH - 200;
-    float mazeHeight = Constants::WINDOW_HEIGHT - 200;
+    float mazeWidth = Constants::WALL_LENGTH;
+    float mazeHeight = Constants::WALL_LENGTH;
 
     float xAdd = ((-mazeWidth/2)+Constants::WINDOW_WIDTH/2)/mazeWidth;
     float yAdd = ((-mazeHeight/2)+Constants::WINDOW_HEIGHT/2)/mazeHeight;
@@ -296,8 +304,8 @@ void Maze::generatePath(Ball& ball) {
     // Add intermediate waypoints to create an interesting path
     // This is a simple example - you can make this more complex
     
-    float mazeWidth = Constants::WINDOW_WIDTH - 200;
-    float mazeHeight = Constants::WINDOW_HEIGHT - 200;
+    float mazeWidth = Constants::WALL_LENGTH;
+    float mazeHeight = Constants::WALL_LENGTH;
     float imgWidth = get_img().cols;
     float imgHeight = get_img().rows;
     float xAdd = ((-mazeWidth/2)+Constants::WINDOW_WIDTH/2)/mazeWidth;
