@@ -42,6 +42,7 @@ class Updater
     float receivedTiltX = 0.0f, receivedTiltY = 0.0f;
     float receivedBallX = 0.0f, receivedBallY = 0.0f;
     float ballVelX = 0.0f, ballVelY = 0.0f;
+    float ballPosX_mm = 0.0f, ballPosY_mm = 0.0f;
 
     // Effectively a flag to indicate new data is available
     std::condition_variable dataCondVar;

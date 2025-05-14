@@ -55,9 +55,9 @@ int main() {
     // Define real-world board corners (in mm, e.g. 220x220 mm)
     std::vector<cv::Point2f> boardCorners = {
         {0, 0},
-        {220, 0},
-        {220, 220},
-        {0, 220}
+        {880, 0},
+        {880, 880},
+        {0, 880}
     };
 
     // Compute homography
@@ -69,8 +69,19 @@ int main() {
     fs.release();
     std::cout << "Homography saved to homography.yml" << std::endl;
 
+    cv::Mat cropped;
+    cv::warpPerspective(
+        img, cropped, H,
+        cv::Size(880, 880)
+    );
+
+    cv::imwrite("Cropped_board.jpg", cropped);
+    cv::imshow("Cropped Board", cropped);
+    cv::waitKey(0);
+    cv::destroyAllWindows();
+
     // Pass the calibration image to the simulation
-    Updater updater(img);
+    Updater updater(cropped);
     updater.update();
 
     return 0;

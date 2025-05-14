@@ -101,8 +101,8 @@ void Updater::physicsUpdate() {
         float tiltY = receivedTiltY;
 
         // Convert tilt to radians to calculate acceleration
-        float ax = g * std::sin(tiltX * M_PI / 180.0f); // m/s^2
-        float ay = g * std::sin(tiltY * M_PI / 180.0f);
+        float ax = Constants::GRAVITY * std::sin(tiltX * M_PI / 180.0f); // m/s^2
+        float ay = Constants::GRAVITY * std::sin(tiltY * M_PI / 180.0f);
 
         // Update velocity
         ballVelX += ax * dt * 1000.0f; // mm/s
@@ -173,7 +173,7 @@ void Updater::cameraUpdate() {
 
             if (!first) {
                 float dx_mm = (x - prevX);
-                float dy_mm = (y - prevY)f;
+                float dy_mm = (y - prevY);
                 float dt = std::chrono::duration_cast<std::chrono::milliseconds>(now - prevTime).count() / 1000.0f;
                 if (dt > 0) {
                     ballVelX = dx_mm / dt;
@@ -220,5 +220,3 @@ void Updater::sendAngle() {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 }
-
-s
