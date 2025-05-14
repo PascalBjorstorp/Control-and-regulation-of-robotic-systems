@@ -2,9 +2,9 @@
 
 Updater::Updater(cv::Mat img)
 : _window(sf::VideoMode(Constants::WINDOW_WIDTH, Constants::WINDOW_HEIGHT), "Maze Game"),
-  _ball(Constants::WINDOW_WIDTH / 4, Constants::WINDOW_HEIGHT / 4),
+  _ball(Constants::WINDOW_WIDTH / 2, Constants::WINDOW_HEIGHT / 2),
     _maze(img),
-    _ballDetector("/dev/video0"){
+    _ballDetector("/dev/video2"){
     
     _window.setFramerateLimit(60);
 
@@ -24,8 +24,8 @@ Updater::Updater(cv::Mat img)
     cameraThread = std::thread(&Updater::cameraUpdate, this);
     angleTX = std::thread(&Updater::sendAngle, this);
     physicsThread = std::thread(&Updater::physicsUpdate, this);
-    _ballDetector.running = true;
-    ballDetect = std::thread(&BallDetector::detectionLoop, &_ballDetector);
+    //_ballDetector.running = false;
+    //ballDetect = std::thread(&BallDetector::detectionLoop, &_ballDetector);
 }
 
 Updater::~Updater() {
@@ -47,6 +47,8 @@ void Updater::update(){
             tiltX = _maze.getTiltX();
             tiltY = _maze.getTiltY();
         }
+
+        //std::cout << "TiltX: " << tiltX << ", TiltY: " << tiltY << std::endl;
 
         sf::Event event;
         while (_window.pollEvent(event)) {
@@ -87,25 +89,28 @@ void Updater::update(){
 void Updater::physicsUpdate() {
     while (running) {
         std::unique_lock<std::mutex> lock(dataMutex);
-        dataCondVar.wait(lock, [this]{ return newDataAvailable || !running; });
-        if (!running) break;
+        dataCondVar.wait(lock, [this]{ return newDataAvailable;});
         float tiltX = receivedTiltX;
         float tiltY = receivedTiltY;
         float ballX = receivedBallX;
         float ballY = receivedBallY;        
         newDataAvailable = false;
-        lock.unlock();
 
         // Update the maze tilt angles based on received data
         _maze.setTiltX(tiltX);
         _maze.setTiltY(tiltY);
         _maze.updateProjection();
+        //std::cout << "TiltX: " << tiltX << ", TiltY: " << tiltY << std::endl;
 
         // Update the ball's position based on the tilt angles and ball position
-        float simX = ballX - Constants::WINDOW_WIDTH / 2;
-        float simY = ballY - Constants::WINDOW_HEIGHT / 2;
-        _ball.setPosition3D(Point3D(simX, simY, 0));
+        //float simX = ballX - Constants::WINDOW_WIDTH / 2;
+        //float simY = ballY - Constants::WINDOW_HEIGHT / 2;
+        //_ball.setPosition3D(Point3D(simX, simY, 0));
         _ball.update(tiltX, tiltY);
+
+        // unlock the mutex
+        lock.unlock();
+        dataCondVar.notify_one(); // Notify any waiting threads
     }
 }
 
@@ -116,15 +121,15 @@ void Updater::angleUpdate() {
         if (_uart.receivemsg(motor, angle)) {
             std::lock_guard<std::mutex> lock(dataMutex);
             if (motor == 0) {
-                receivedTiltX = angle;
+                receivedTiltX = angle  / 3;
             } else {
-                receivedTiltY = angle;
+                receivedTiltY = angle / 3;
             }
             dataCondVar.notify_one();
-        } else {
-            // Short sleep to avoid busy waiting
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            newDataAvailable = true;
         }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 
@@ -138,19 +143,32 @@ void Updater::cameraUpdate() {
             newDataAvailable = true;
             dataCondVar.notify_one(); // Move inside the if-block
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
     }
 }
 
 void Updater::sendAngle() {
-    while (false) {
-        // Get desired angles from Maze (implement these getters in Maze)
-        //float desiredX = _maze.getDesiredAngleX();
-        //float desiredY = _maze.getDesiredAngleY();
+    while (true) {
+        // Generate a continous number between -15 and 15
+        static float t = 0;
+        int motor = 0;
+        float angle = 0;
+        t += 0.5f;
+        // Simulate a sine wave for X and Y angles
+        static bool toggle = false;
+        toggle = !toggle;
+        if (toggle) {
+            motor = 0; // X
+            angle = 10.0f * std::sin(t); // Simulate X tilt
+        } else {
+            motor = 1; // Y
+            angle = 10.0f * std::cos(t); // Simulate Y tilt
+        }
 
-        //_uart.sendmsg(0, desiredX); // 0 for X motor
-        //_uart.sendmsg(1, desiredY); // 1 for Y motor
+        // Send the angle to the UART
+        _uart.sendmsg(motor, angle);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(20)); // Adjust as needed
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 }
+

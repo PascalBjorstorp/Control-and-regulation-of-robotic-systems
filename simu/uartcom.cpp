@@ -46,8 +46,8 @@ UARTcom::UARTcom() {
                                                                         // men hvis den får data indenfor intervaller af timeout fortsætter den
     tty.c_cc[VMIN] = 1;                                                 // Venter på at mindst 1 byte er læst ind før den går videre altså den venter her for evigt indtil den får en byte data
 
-    cfsetispeed(&tty, B19200);                                           // Sætter in og output baud rate til 9600
-    cfsetospeed(&tty, B19200);
+    cfsetispeed(&tty, B115200);                                           // Sætter in og output baud rate til 9600
+    cfsetospeed(&tty, B115200);
 
     if (tcsetattr(_serial_port, TCSANOW, &tty) != 0) {                   // Gemmer de nye settings vi har defineret indtil nu og tjekker for fejl
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
@@ -55,17 +55,10 @@ UARTcom::UARTcom() {
 }
 
 uint8_t UARTcom::convertFloatToMsg(int motorSelect, float value){
-    float normalized = 2.0f * (value - minFloat) / (maxFloat - minFloat) - 1.0f;
+    value = value + 64;
+    uint8_t data = static_cast<uint8_t>(value);
 
-    int scaled = static_cast<int>(std::round(normalized * 63));
-
-    scaled = std::max(-63, std::min(63, scaled));
-
-    uint8_t data = static_cast<int8_t>(abs(scaled));
-
-    if(scaled < 0){
-        data |= 0x40; // Set bit 7
-    }
+    data &= 0x7F;  // Clear bit 8 to ensure it's not set
 
     if (motorSelect != 0) {
         data |= 0x80;  // Set bit 8
@@ -76,10 +69,6 @@ uint8_t UARTcom::convertFloatToMsg(int motorSelect, float value){
 
 void UARTcom::sendmsg(int motorSelect, float inputNumber) {
     uint8_t msg = convertFloatToMsg(motorSelect, inputNumber);                                         /* Her skriver vi vores besked til atmegaen */
-
-    std::string debugCunt = std::bitset<8>(msg).to_string();
-    std::cout << motorSelect << ": " <<debugCunt << " Voltage: " << inputNumber <<std::endl;
-
     write(_serial_port, &msg, sizeof(msg));
 }
 
@@ -89,7 +78,7 @@ void UARTcom::sendmsg(int motorSelect, float inputNumber) {
  * @param[out] angle       Angle in range [-5, 5]
  * @return true if a byte was read, false otherwise
  */
-/*
+
 bool UARTcom::receivemsg(int& motorSelect, float& angle) {
     uint8_t msg = 0;
     ssize_t bytesRead = read(_serial_port, &msg, 1);
@@ -100,13 +89,16 @@ bool UARTcom::receivemsg(int& motorSelect, float& angle) {
     motorSelect = (msg & 0x80) ? 1 : 0; // MSB: 0 = motor 1, 1 = motor 2
 
     uint8_t value = msg & 0x7F; // 7 LSB
-    // Map 0-127 to -5 to 5
-    angle = ((float)value / 127.0f) * 10.0f - 5.0f;
+    angle = (static_cast<float>(value) - 64.0f) / 4; // Convert to range [-64, 63]
+    //std::cout << "Motor: " << motorSelect << ", Angle: " << angle << std::endl;
 
+    std::string debugCunt = std::bitset<8>(msg).to_string();
+    std::cout << motorSelect << ": " <<debugCunt << " Receive Angle: " << angle << std::endl;
     return true;
 }
-    */
+
 // Simulation of receiving a message
+/*
 bool UARTcom::receivemsg(int& motor, float& angle) {
     static float t = 0;
     t += 0.03f;
@@ -123,3 +115,4 @@ bool UARTcom::receivemsg(int& motor, float& angle) {
     std::this_thread::sleep_for(std::chrono::milliseconds(20)); // Simulate UART delay
     return true;
 }
+*/

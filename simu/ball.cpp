@@ -24,11 +24,11 @@ void Ball::update(float tiltX, float tiltY) {
     sf::Vector2f acceleration(-std::sin(radY) * Constants::GRAVITY, std::sin(radX) * Constants::GRAVITY);
 
     // Apply acceleration and friction
-    velocity += acceleration;
+    velocity += acceleration * Constants::TIME_STEP;
 
     // Update 3D position (z remains 0 as ball stays on the surface)
-    position3D._x += velocity.x;
-    position3D._y += velocity.y;
+    position3D._x += velocity.x * Constants::TIME_STEP;
+    position3D._y += velocity.y * Constants::TIME_STEP;;
 
     // Create a rotated copy for projection
     Point3D rotatedPosition = position3D;
