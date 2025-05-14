@@ -12,6 +12,7 @@ private:
     float _ballX = 0.0f, _ballY = 0.0f;
     std::string device;
     bool hasBall = false;
+    cv::Mat homography;
 
 public:
     std::atomic<bool> running{false};

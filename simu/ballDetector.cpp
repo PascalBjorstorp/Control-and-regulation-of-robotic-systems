@@ -2,13 +2,32 @@
 #include <limits>
 #include <algorithm>
 
-BallDetector::BallDetector(const std::string& device_) : device(device_) {}
+BallDetector::BallDetector(const std::string& device_) : device(device_) {
+    // Load homography from file
+    cv::FileStorage fs("homography.yml", cv::FileStorage::READ);
+    if (fs.isOpened()) {
+        fs["H"] >> homography;
+        fs.release();
+    } else {
+        std::cerr << "Warning: Could not load homography.yml. Ball positions will be in pixels!" << std::endl;
+        homography = cv::Mat(); // Empty
+    }
+}
 
 bool BallDetector::getBallPosition(float& x, float& y) {
     std::lock_guard<std::mutex> lock(posMutex);
     if(!hasBall) return false;
-    x = _ballX;
-    y = _ballY;
+
+    if (!homography.empty()) {
+        std::vector<cv::Point2f> src = {cv::Point2f(_ballX, _ballY)};
+        std::vector<cv::Point2f> dst;
+        cv::perspectiveTransform(src, dst, homography);
+        x = dst[0].x; // in mm
+        y = dst[0].y; // in mm
+    } else {
+        x = _ballX; // fallback: pixels
+        y = _ballY;
+    }
     return true;
 }
 
@@ -60,7 +79,7 @@ void BallDetector::detectionLoop() {
             hasBall = false;
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
     }
 }
 

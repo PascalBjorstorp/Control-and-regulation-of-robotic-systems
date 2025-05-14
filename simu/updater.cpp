@@ -87,30 +87,55 @@ void Updater::update(){
 }
 
 void Updater::physicsUpdate() {
+     auto prevTime = std::chrono::steady_clock::now();
     while (running) {
         std::unique_lock<std::mutex> lock(dataMutex);
-        dataCondVar.wait(lock, [this]{ return newDataAvailable;});
+        
+        // Time step calculation
+        auto now = std::chrono::steady_clock::now();
+        float dt = std::chrono::duration_cast<std::chrono::milliseconds>(now - prevTime).count() / 1000.0f;
+        prevTime = now;
+
+        // Variables for tilt and ball position
         float tiltX = receivedTiltX;
         float tiltY = receivedTiltY;
-        float ballX = receivedBallX;
-        float ballY = receivedBallY;        
-        newDataAvailable = false;
+
+        // Convert tilt to radians to calculate acceleration
+        float ax = g * std::sin(tiltX * M_PI / 180.0f); // m/s^2
+        float ay = g * std::sin(tiltY * M_PI / 180.0f);
+
+        // Update velocity
+        ballVelX += ax * dt * 1000.0f; // mm/s
+        ballVelY += ay * dt * 1000.0f; // mm/s
+
+        // Update position (in mm)
+        ballPosX_mm += ballVelX * dt;
+        ballPosY_mm += ballVelY * dt;
+
+        if (newDataAvailable) {
+            // Convert to mm by dividing by 4.0f (1 pixel = 4 mm)
+            ballPosX_mm = receivedBallX;
+            ballPosY_mm = receivedBallY;
+
+            // new data has been received, reset the flag
+            newDataAvailable = false;
+        }
+
+        // In pixels
+        float ballX = (ballPosX_mm * 4.0f) - Constants::WINDOW_WIDTH / 2; // mm to pixels
+        float ballY = (ballPosY_mm * 4.0f) - Constants::WINDOW_HEIGHT / 2; // mm to pixels
 
         // Update the maze tilt angles based on received data
         _maze.setTiltX(tiltX);
         _maze.setTiltY(tiltY);
         _maze.updateProjection();
-        //std::cout << "TiltX: " << tiltX << ", TiltY: " << tiltY << std::endl;
 
         // Update the ball's position based on the tilt angles and ball position
-        //float simX = ballX - Constants::WINDOW_WIDTH / 2;
-        //float simY = ballY - Constants::WINDOW_HEIGHT / 2;
-        //_ball.setPosition3D(Point3D(simX, simY, 0));
-        _ball.update(tiltX, tiltY);
+        _ball.setPosition3D(Point3D(ballX, ballY, 0));
+        //_ball.update(tiltX, tiltY);
 
-        // unlock the mutex
-        lock.unlock();
-        dataCondVar.notify_one(); // Notify any waiting threads
+        // Sleep for a short duration to control the update rate
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 }
 
@@ -134,17 +159,41 @@ void Updater::angleUpdate() {
 }
 
 void Updater::cameraUpdate() {
+    float prevX = 0, prevY = 0;
+    auto prevTime = std::chrono::steady_clock::now();
+    bool first = true;
+
     while (running) {
         float x, y;
         if (_ballDetector.getBallPosition(x, y)) {
+            auto now = std::chrono::steady_clock::now();
             std::lock_guard<std::mutex> lock(dataMutex);
             receivedBallX = x;
             receivedBallY = y;
+
+            if (!first) {
+                float dx_mm = (x - prevX);
+                float dy_mm = (y - prevY)f;
+                float dt = std::chrono::duration_cast<std::chrono::milliseconds>(now - prevTime).count() / 1000.0f;
+                if (dt > 0) {
+                    ballVelX = dx_mm / dt;
+                    ballVelY = dy_mm / dt;
+                }
+            } else {
+                ballVelX = 0;
+                ballVelY = 0;
+                first = false;
+            }
+
+            prevX = x;
+            prevY = y;
+            prevTime = now;
+
             newDataAvailable = true;
-            dataCondVar.notify_one(); // Move inside the if-block
+            dataCondVar.notify_one();   
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(30));
-    }
+    } 
 }
 
 void Updater::sendAngle() {
@@ -172,3 +221,4 @@ void Updater::sendAngle() {
     }
 }
 
+s
