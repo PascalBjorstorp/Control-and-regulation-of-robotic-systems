@@ -12,14 +12,13 @@
 class lineDetecter : public imageHandler
 {
     std::vector<cv::Vec4i> _lines;
-    std::vector<cv::Vec3f> _SS_points;
     cv::Mat _img, output;
     std::vector<cv::Point> _inters;
     std::vector<cv::Vec4i> _comp_path;
     std::vector<cv::Vec4i> _perps;
     std::vector<int> _perp_and_line_id;
     int _start_id = 0;
-    int _min_length = 10;
+    int _min_length = 25;
     int _perp_length = 55;
     int _angle_limit = 5;
 
@@ -67,6 +66,8 @@ public:
     void sort_perps();
 
     void eliminate_long_lines(int max_len);
+
+    static void onMouse(int event, int x, int y, int, void*);
 
     std::vector<cv::Point> get_inters() { return _inters; }
 };

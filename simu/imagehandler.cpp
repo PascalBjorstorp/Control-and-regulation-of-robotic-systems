@@ -6,9 +6,9 @@ imageHandler::imageHandler(cv::Mat img):_img(img)
     isolate_green();
     isolate_blue();
     isolate_red();
-    detect_SS(&_green_img);
-    detect_SS(&_red_img);
-    rmv_SS();
+    //detect_SS(&_green_img);
+    //detect_SS(&_red_img);
+    //rmv_SS();
     cvtColor(_img, _img, cv::COLOR_BGR2GRAY);
     perform_skeletonization();
     perform_dilate();
@@ -40,7 +40,7 @@ void imageHandler::isolate_green(){
 
     inRange(hsv, cv::Scalar(35, 100, 50), cv::Scalar(85, 255, 255), _green_img);
 }
-
+/*
 void imageHandler::detect_SS(cv::Mat *img){
     cv::Mat temp;
     cv::Vec3f fin_circ;
@@ -58,13 +58,14 @@ void imageHandler::detect_SS(cv::Mat *img){
 
     _SS_points.push_back(fin_circ);
 }
-
+*/
+/*
 void imageHandler::rmv_SS(){
     for(int i = 0; i < _SS_points.size(); i++){
         circle(_img, cv::Point(_SS_points[i][0], _SS_points[i][1]), _SS_points[i][2] + 10, cv::Scalar(255,255,255), -1);
     }
 }
-
+*/
 void imageHandler::perform_skeletonization(){
     threshold(_img, _img, _threshhold, 255, cv::THRESH_BINARY_INV);
 

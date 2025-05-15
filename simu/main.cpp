@@ -14,9 +14,9 @@ void onMouse(int event, int x, int y, int, void*) {
 
 int main() {
     // Create the updater object and start the main update loop
-    //cv::Mat img = cv::imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/ForSimulation/test_img_2.jpg", cv::IMREAD_COLOR);
-    
-    cv::VideoCapture cap(0);
+    cv::Mat img = cv::imread("/home/aksel/Pictures/TestPic/calibration_image1.jpg", cv::IMREAD_COLOR);
+    /*
+    cv::VideoCapture cap(2);
     if (!cap.isOpened()) {
         std::cerr << "Could not open camera!" << std::endl;
         return -1;
@@ -28,13 +28,13 @@ int main() {
     if (img.empty()) {
         std::cerr << "Failed to capture image from camera!" << std::endl;
         return -1;
-    }
+    }*/
 
     // Save the captured image for calibration
     cv::imwrite("calibration_image.jpg", img);
 
     // Interactive calibration: click 4 corners
-    cv::namedWindow("Calibration Image");
+    cv::namedWindow("Calibration Image", cv::WINDOW_NORMAL);
     cv::setMouseCallback("Calibration Image", onMouse, nullptr);
     std::cout << "Click the 4 corners of the board in order: top-left, top-right, bottom-right, bottom-left." << std::endl;
 
