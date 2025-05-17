@@ -1,11 +1,29 @@
 #include "linedetecter.h"
 
+std::vector<cv::Vec3f> _SS_points;
+
 lineDetecter::lineDetecter(cv::Mat img): imageHandler(img) {
 
     _img = get_img();
     output = img.clone();
+
+    cv::namedWindow("SS image", cv::WINDOW_NORMAL);
+    cv::setMouseCallback("SS image", lineDetecter::onMouse, nullptr);
+
+    std::cout << _SS_points.size() << std::endl;
+
+    while (_SS_points.size() < 2) {
+        cv::Mat display = output.clone();
+        for (const auto& pt : _SS_points)
+            cv::circle(display, cv::Point(pt[0], pt[1]), 5, cv::Scalar(0, 0, 255), -1);
+        cv::imshow("SS image", display);
+        if (cv::waitKey(10) == 27) break; // ESC to exit
+    }
+    cv::destroyAllWindows();
+
     cvtColor(_img, output, cv::COLOR_GRAY2BGR);
-    _SS_points = get_SS_points();
+
+    //_SS_points = get_SS_points();
 
     detect_lines();
     sort();
@@ -580,5 +598,13 @@ void lineDetecter::eliminate_long_lines(int max_len){
             _lines.erase(_lines.begin() + i);
             i--;
         }
+    }
+}
+
+void lineDetecter::onMouse(int event, int x, int y, int, void*) {
+    std::cout << "Click now" << std::endl;
+    if (event == cv::EVENT_LBUTTONDOWN && _SS_points.size() < 2) {
+        _SS_points.push_back(cv::Vec3f(x, y, 5));
+        std::cout << "Clicked: " << x << ", " << y << std::endl;
     }
 }

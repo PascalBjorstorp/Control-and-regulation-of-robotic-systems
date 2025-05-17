@@ -14,9 +14,9 @@ void onMouse(int event, int x, int y, int, void*) {
 
 int main() {
     // Create the updater object and start the main update loop
-    //cv::Mat img = cv::imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/ForSimulation/test_img_2.jpg", cv::IMREAD_COLOR);
-    
-    cv::VideoCapture cap(0);
+    //cv::Mat img = cv::imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/ForSimulation/test_img_ended.jpg", cv::IMREAD_COLOR);
+
+    cv::VideoCapture cap(2);
     if (!cap.isOpened()) {
         std::cerr << "Could not open camera!" << std::endl;
         return -1;
@@ -29,19 +29,20 @@ int main() {
         std::cerr << "Failed to capture image from camera!" << std::endl;
         return -1;
     }
+    cap.release();
 
     // Save the captured image for calibration
     cv::imwrite("calibration_image.jpg", img);
 
     // Interactive calibration: click 4 corners
-    cv::namedWindow("Calibration Image");
+    cv::namedWindow("Calibration Image", cv::WINDOW_NORMAL);
     cv::setMouseCallback("Calibration Image", onMouse, nullptr);
     std::cout << "Click the 4 corners of the board in order: top-left, top-right, bottom-right, bottom-left." << std::endl;
 
     while (clickedPoints.size() < 4) {
         cv::Mat display = img.clone();
         for (const auto& pt : clickedPoints)
-            cv::circle(display, pt, 5, cv::Scalar(0, 0, 255), -1);
+            cv::circle(display, pt, 20, cv::Scalar(0, 0, 255), -1);
         cv::imshow("Calibration Image", display);
         if (cv::waitKey(10) == 27) break; // ESC to exit
     }
@@ -55,9 +56,9 @@ int main() {
     // Define real-world board corners (in mm, e.g. 220x220 mm)
     std::vector<cv::Point2f> boardCorners = {
         {0, 0},
-        {220, 0},
-        {220, 220},
-        {0, 220}
+        {880, 0},
+        {880, 880},
+        {0, 880}
     };
 
     // Compute homography
@@ -69,18 +70,11 @@ int main() {
     fs.release();
     std::cout << "Homography saved to homography.yml" << std::endl;
 
-    // Warp the image to crop and rectify the board area
-cv::Mat cropped;
-cv::warpPerspective(
-    img, cropped, H,
-     cv::Size(880, 880)
-);
-
-    // Optionally save or display the cropped image for verification
-    cv::imwrite("cropped_board.jpg", cropped);
-    cv::imshow("Cropped Board", cropped);
-    cv::waitKey(0);
-    cv::destroyAllWindows();
+    cv::Mat cropped;
+    cv::warpPerspective(
+        img, cropped, H,
+        cv::Size(880, 880)
+    );
 
     // Pass the calibration image to the simulation
     Updater updater(cropped);

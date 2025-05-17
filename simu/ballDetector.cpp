@@ -18,21 +18,14 @@ bool BallDetector::getBallPosition(float& x, float& y) {
     std::lock_guard<std::mutex> lock(posMutex);
     if(!hasBall) return false;
 
-    if (!homography.empty()) {
-        std::vector<cv::Point2f> src = {cv::Point2f(_ballX, _ballY)};
-        std::vector<cv::Point2f> dst;
-        cv::perspectiveTransform(src, dst, homography);
-        x = dst[0].x / 4.0f; // in mm
-        y = dst[0].y / 4.0f; // in mm
-    } else {
-        x = _ballX; // fallback: pixels
-        y = _ballY;
-    }
+    x = _ballX / 4; 
+    y = _ballY / 4;
+    
     return true;
 }
 
 void BallDetector::detectionLoop() {
-    cv::VideoCapture cap(device);
+    cv::VideoCapture cap(2);
     if (!cap.isOpened()) return;
 
     cv::Mat img, blue_img;
@@ -43,13 +36,20 @@ void BallDetector::detectionLoop() {
             continue;
         }
 
+        // Apply homography and crop to match main.cpp
+        if (!homography.empty()) {
+            cv::Mat warped;
+            cv::warpPerspective(img, warped, homography, cv::Size(880, 880));
+            img = warped;
+        }
+
         cv::Mat hsv;
         cv::cvtColor(img, hsv, cv::COLOR_BGR2HSV);
         cv::inRange(hsv, cv::Scalar(100, 150, 50), cv::Scalar(140, 255, 255), blue_img);
 
         std::vector<int> locations1(4), locations2(4), locations3(4), locations4(4);
         int rows = img.rows, cols = img.cols;
-        
+
         #pragma omp parallel sections
         {
             #pragma omp section
@@ -70,16 +70,27 @@ void BallDetector::detectionLoop() {
         if (bottom > 0 && top < rows && right > 0 && left < cols) {
             float cx = (left + right) / 2.0f;
             float cy = (top + bottom) / 2.0f;
-            std::lock_guard<std::mutex> lock(posMutex);
-            _ballX = cx;
-            _ballY = cy;
-            hasBall = true;
+            {
+                std::lock_guard<std::mutex> lock(posMutex);
+                _ballX = cx;
+                _ballY = cy;
+                hasBall = true;
+            }
+        
+            // Draw a circle at the detected ball position
+            cv::Mat imgWithCircle = img.clone();
+            cv::circle(imgWithCircle, cv::Point(static_cast<int>(cx), static_cast<int>(cy)), 15, cv::Scalar(0, 0, 255), 2);
+
+            // Show the image (for debugging)
+            cv::imshow("Ball Detection", imgWithCircle);
+            cv::waitKey(1); // Needed to update the window
+        
+            // Optionally, save the image
+            // cv::imwrite("detected_ball.png", imgWithCircle);
         } else {
             std::lock_guard<std::mutex> lock(posMutex);
             hasBall = false;
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
     }
 }
 

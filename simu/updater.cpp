@@ -5,7 +5,7 @@ Updater::Updater(cv::Mat img)
   _ball(Constants::WINDOW_WIDTH / 2, Constants::WINDOW_HEIGHT / 2),
     _maze(img),
     _ballDetector("/dev/video2"){
-    
+
     _window.setFramerateLimit(60);
 
     if (!_font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")) {
@@ -24,8 +24,8 @@ Updater::Updater(cv::Mat img)
     cameraThread = std::thread(&Updater::cameraUpdate, this);
     angleTX = std::thread(&Updater::sendAngle, this);
     physicsThread = std::thread(&Updater::physicsUpdate, this);
-    //_ballDetector.running = false;
-    //ballDetect = std::thread(&BallDetector::detectionLoop, &_ballDetector);
+    _ballDetector.running = true;
+    ballDetect = std::thread(&BallDetector::detectionLoop, &_ballDetector);
 }
 
 Updater::~Updater() {
@@ -42,13 +42,25 @@ Updater::~Updater() {
 void Updater::update(){
     while (_window.isOpen()) {
         float tiltX, tiltY;
+        // Get all data from maze and ball
+        sf::CircleShape ballShape;
+        sf::ConvexShape mazeBackground;
+        sf::VertexArray pathPoints;
+        std::vector<sf::CircleShape> waypointMarkers;
+        std::vector<Wall> walls;
+        sf::CircleShape targetMarker;;
+        // Lock the mutex to safely access shared data
         {
-            std::lock_guard<std::mutex> lock(dataMutex);
-            tiltX = _maze.getTiltX();
-            tiltY = _maze.getTiltY();
+            std::unique_lock<std::mutex> lock(dataMutex);
+            tiltX = receivedTiltX;
+            tiltY = receivedTiltY;
+            mazeBackground = _maze.getBackground();
+            pathPoints = _maze.getPath();
+            waypointMarkers = _maze.getWaypointMarkers();
+            walls = _maze.getWalls();
+            targetMarker = _maze.getTargetMarker();
+            ballShape = _ball.getShape();
         }
-
-        //std::cout << "TiltX: " << tiltX << ", TiltY: " << tiltY << std::endl;
 
         sf::Event event;
         while (_window.pollEvent(event)) {
@@ -74,68 +86,73 @@ void Updater::update(){
         for (const auto& marker : _maze.getWaypointMarkers()) {
             _window.draw(marker);              // Draw waypoint markers
         }
-        _window.draw(_angleText);              // Draw angle text on top 
+        _window.draw(_angleText);              // Draw angle text on top
         for (Wall& wall : _maze.getWalls()) {
             _window.draw(wall.getShape());     // Draw walls
         }
         _window.draw(_maze.getTargetMarker()); // Draw target marker
-        _window.draw(_ball.getShape());        // Draw ball
+        _window.draw(ballShape);        // Draw ball
 
         // Display the window contents
         _window.display();
     }
 }
 
-void Updater::physicsUpdate() { 
-     auto prevTime = std::chrono::steady_clock::now();
+void Updater::physicsUpdate() {
+    auto prevTime = std::chrono::steady_clock::now();
     while (running) {
-        std::unique_lock<std::mutex> lock(dataMutex);
-        
-        // Time step calculation
+        float tiltX, tiltY, ballX_mm, ballY_mm;
+        bool hasNewData = false;
+
+        // Only lock while copying shared data
+        {
+            std::unique_lock<std::mutex> lock(dataMutex);
+            tiltX = receivedTiltX;
+            tiltY = receivedTiltY;
+            if (newDataAvailable) {
+                ballX_mm = receivedBallX;
+                ballY_mm = receivedBallY;
+                newDataAvailable = false;
+                hasNewData = true;
+            } else {
+                ballX_mm = ballPosX_mm;
+                ballY_mm = ballPosY_mm;
+            }
+        }
+
+        // Now do physics calculations outside the lock!
         auto now = std::chrono::steady_clock::now();
         float dt = std::chrono::duration_cast<std::chrono::milliseconds>(now - prevTime).count() / 1000.0f;
         prevTime = now;
 
-        // Variables for tilt and ball position
-        float tiltX = receivedTiltX;
-        float tiltY = receivedTiltY;
-
         // Convert tilt to radians to calculate acceleration
         float ax = (5/7) * g * std::sin(tiltX * M_PI / 180.0f); // m/s^2
         float ay = (5/7) * g * std::sin(tiltY * M_PI / 180.0f);
+        
+        ballVelX += ax * dt * 1000.0f;
+        ballVelY += ay * dt * 1000.0f;
 
-        // Update velocity
-        ballVelX += ax * dt * 1000.0f; // mm/s
-        ballVelY += ay * dt * 1000.0f; // mm/s
-
-        // Update position (in mm)
         ballPosX_mm += ballVelX * dt;
         ballPosY_mm += ballVelY * dt;
 
-        if (newDataAvailable) {
-            // Convert to mm by dividing by 4.0f (1 pixel = 4 mm)
-            ballPosX_mm = receivedBallX;
-            ballPosY_mm = receivedBallY;
-
-            // new data has been received, reset the flag
-            newDataAvailable = false;
+        if (hasNewData) {
+            ballPosX_mm = ballX_mm;
+            ballPosY_mm = ballY_mm;
         }
 
-        // In pixels
-        float ballX = (ballPosX_mm * 4.0f) - Constants::WINDOW_WIDTH / 2; // mm to pixels
-        float ballY = (ballPosY_mm * 4.0f) - Constants::WINDOW_HEIGHT / 2; // mm to pixels
+        float ballX = ((ballPosX_mm * 4.0f) - Constants::WALL_LENGTH / 2);
+        float ballY = ((ballPosY_mm * 4.0f) - Constants::WALL_LENGTH / 2);
 
-        // Update the maze tilt angles based on received data
-        _maze.setTiltX(tiltX);
-        _maze.setTiltY(tiltY);
-        _maze.updateProjection();
-
-        // Update the ball's position based on the tilt angles and ball position
-        _ball.setPosition3D(Point3D(ballX, ballY, 0));
-        //_ball.update(tiltX, tiltY);
-
-        // Sleep for a short duration to control the update rate
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        {
+            std::lock_guard<std::mutex> lock(dataMutex);
+            _maze.setTiltX(tiltX);
+            _maze.setTiltY(tiltY);
+            _maze.updateProjection();
+            _ball.setPosition3D(Point3D(ballX, ballY, 0));
+            _ball.update(tiltX, tiltY);
+        }
+        //std::cout << "Ball Position: " << ballX << ", " << ballY << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
     }
 }
 
@@ -143,8 +160,9 @@ void Updater::angleUpdate() {
     while (running) {
         int motor;
         float angle;
+        receivedTiltY = 1/3;
         if (_uart.receivemsg(motor, angle)) {
-            std::lock_guard<std::mutex> lock(dataMutex);
+            std::unique_lock<std::mutex> lock(dataMutex);
             if (motor == 0) {
                 receivedTiltX = angle  / 3;
             } else {
@@ -173,7 +191,7 @@ void Updater::cameraUpdate() {
 
             if (!first) {
                 float dx_mm = (x - prevX);
-                float dy_mm = (y - prevY)f;
+                float dy_mm = (y - prevY);
                 float dt = std::chrono::duration_cast<std::chrono::milliseconds>(now - prevTime).count() / 1000.0f;
                 if (dt > 0) {
                     ballVelX = dx_mm / dt;
@@ -190,10 +208,10 @@ void Updater::cameraUpdate() {
             prevTime = now;
 
             newDataAvailable = true;
-            dataCondVar.notify_one();   
+            dataCondVar.notify_one();
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(30));
-    } 
+    }
 }
 
 void Updater::sendAngle() {
