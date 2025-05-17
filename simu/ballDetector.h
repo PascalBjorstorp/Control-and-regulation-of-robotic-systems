@@ -15,8 +15,8 @@ private:
     cv::Mat homography;
 
 public:
-    std::atomic<bool> running{false};
-    BallDetector(const std::string& device = "/dev/video0");
+    std::atomic<bool> running{true};
+    BallDetector(const std::string& device = "/dev/video2");
     void detectionLoop();
     bool getBallPosition(float& x, float& y);
     void outerPoints(const cv::Mat& img, int startRow, int startCol, int endRow, int endCol, std::vector<int>& locations);

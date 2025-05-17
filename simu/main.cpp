@@ -14,8 +14,8 @@ void onMouse(int event, int x, int y, int, void*) {
 
 int main() {
     // Create the updater object and start the main update loop
-    cv::Mat img = cv::imread("/home/aksel/Pictures/TestPic/calibration_image1.jpg", cv::IMREAD_COLOR);
-    /*
+    //cv::Mat img = cv::imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/ForSimulation/test_img_ended.jpg", cv::IMREAD_COLOR);
+
     cv::VideoCapture cap(2);
     if (!cap.isOpened()) {
         std::cerr << "Could not open camera!" << std::endl;
@@ -28,7 +28,8 @@ int main() {
     if (img.empty()) {
         std::cerr << "Failed to capture image from camera!" << std::endl;
         return -1;
-    }*/
+    }
+    cap.release();
 
     // Save the captured image for calibration
     cv::imwrite("calibration_image.jpg", img);
@@ -41,7 +42,7 @@ int main() {
     while (clickedPoints.size() < 4) {
         cv::Mat display = img.clone();
         for (const auto& pt : clickedPoints)
-            cv::circle(display, pt, 5, cv::Scalar(0, 0, 255), -1);
+            cv::circle(display, pt, 20, cv::Scalar(0, 0, 255), -1);
         cv::imshow("Calibration Image", display);
         if (cv::waitKey(10) == 27) break; // ESC to exit
     }
@@ -74,11 +75,6 @@ int main() {
         img, cropped, H,
         cv::Size(880, 880)
     );
-
-    cv::imwrite("Cropped_board.jpg", cropped);
-    cv::imshow("Cropped Board", cropped);
-    cv::waitKey(0);
-    cv::destroyAllWindows();
 
     // Pass the calibration image to the simulation
     Updater updater(cropped);

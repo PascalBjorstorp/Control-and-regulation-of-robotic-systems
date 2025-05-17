@@ -18,8 +18,8 @@ class lineDetecter : public imageHandler
     std::vector<cv::Vec4i> _perps;
     std::vector<int> _perp_and_line_id;
     int _start_id = 0;
-    int _min_length = 25;
-    int _perp_length = 55;
+    int _min_length = 30;
+    int _perp_length = 30;
     int _angle_limit = 5;
 
 public:

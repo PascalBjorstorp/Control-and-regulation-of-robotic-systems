@@ -15,20 +15,20 @@ Ball::Ball(float x, float y) {
 
 void Ball::update(float tiltX, float tiltY) {
     // Convert tilt angles to radians
-    float radX = tiltX * (M_PI / 180.f);
-    float radY = tiltY * (M_PI / 180.f);
+    //float radX = tiltX * (M_PI / 180.f);
+    //float radY = tiltY * (M_PI / 180.f);
 
     // Compute acceleration based on tilt
     // Negative sine for Y-axis makes the ball roll in the intuitive direction
     // (e.g., right tilt makes the ball roll right)
-    sf::Vector2f acceleration(-std::sin(radY) * Constants::GRAVITY, std::sin(radX) * Constants::GRAVITY);
+    //sf::Vector2f acceleration(-std::sin(radY) * Constants::GRAVITY, std::sin(radX) * Constants::GRAVITY);
 
     // Apply acceleration and friction
-    velocity += acceleration * Constants::TIME_STEP;
+    //velocity += acceleration * Constants::TIME_STEP;
 
     // Update 3D position (z remains 0 as ball stays on the surface)
-    position3D._x += velocity.x * Constants::TIME_STEP;
-    position3D._y += velocity.y * Constants::TIME_STEP;;
+    //position3D._x += velocity.x * Constants::TIME_STEP;
+    //position3D._y += velocity.y * Constants::TIME_STEP;;
 
     // Create a rotated copy for projection
     Point3D rotatedPosition = position3D;
