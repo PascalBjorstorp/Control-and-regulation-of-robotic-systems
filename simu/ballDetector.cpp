@@ -22,8 +22,8 @@ bool BallDetector::getBallPosition(float& x, float& y) {
         std::vector<cv::Point2f> src = {cv::Point2f(_ballX, _ballY)};
         std::vector<cv::Point2f> dst;
         cv::perspectiveTransform(src, dst, homography);
-        x = dst[0].x; // in mm
-        y = dst[0].y; // in mm
+        x = dst[0].x / 4.0f; // in mm
+        y = dst[0].y / 4.0f; // in mm
     } else {
         x = _ballX; // fallback: pixels
         y = _ballY;

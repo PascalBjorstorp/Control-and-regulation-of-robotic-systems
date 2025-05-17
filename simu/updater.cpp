@@ -86,7 +86,7 @@ void Updater::update(){
     }
 }
 
-void Updater::physicsUpdate() {
+void Updater::physicsUpdate() { 
      auto prevTime = std::chrono::steady_clock::now();
     while (running) {
         std::unique_lock<std::mutex> lock(dataMutex);
@@ -101,8 +101,8 @@ void Updater::physicsUpdate() {
         float tiltY = receivedTiltY;
 
         // Convert tilt to radians to calculate acceleration
-        float ax = g * std::sin(tiltX * M_PI / 180.0f); // m/s^2
-        float ay = g * std::sin(tiltY * M_PI / 180.0f);
+        float ax = (5/7) * g * std::sin(tiltX * M_PI / 180.0f); // m/s^2
+        float ay = (5/7) * g * std::sin(tiltY * M_PI / 180.0f);
 
         // Update velocity
         ballVelX += ax * dt * 1000.0f; // mm/s
@@ -197,28 +197,72 @@ void Updater::cameraUpdate() {
 }
 
 void Updater::sendAngle() {
-    while (true) {
-        // Generate a continous number between -15 and 15
-        static float t = 0;
-        int motor = 0;
-        float angle = 0;
-        t += 0.5f;
-        // Simulate a sine wave for X and Y angles
-        static bool toggle = false;
-        toggle = !toggle;
-        if (toggle) {
-            motor = 0; // X
-            angle = 10.0f * std::sin(t); // Simulate X tilt
-        } else {
-            motor = 1; // Y
-            angle = 10.0f * std::cos(t); // Simulate Y tilt
+    const float kp = 2.0f; // Proportional gain
+    const float kd = 0.5f; // Derivative gain
+    const float gearRatio = 3.0f;
+    const float maxTilt = 15.0f; // Max tilt in degrees
+
+    size_t waypointIdx = 0;
+
+    while (running) {
+        {
+            std::unique_lock<std::mutex> lock(dataMutex);
+
+            // Use the latest camera-updated position and velocity (in mm)
+            float ballPosX = receivedBallX;
+            float ballPosY = receivedBallY;
+            float ballVelX_local = ballVelX;
+            float ballVelY_local = ballVelY;
+
+            // Get current waypoint as target (in mm)
+            const auto& waypoints = _maze.getPathWaypoints();
+            if (waypoints.empty()) continue;
+
+            lock.unlock();
+
+            // Project waypoint to 2D and convert to mm if needed
+            sf::Vector2f targetPos = waypoints[waypointIdx].project();
+            float targetX = targetPos.x / 4.0f; // convert from pixels to mm if necessary
+            float targetY = targetPos.y / 4.0f;
+
+            // Compute error in mm
+            float errorX = targetX - ballPosX;
+            float errorY = targetY - ballPosY;
+            float distance = std::sqrt(errorX * errorX + errorY * errorY);
+
+            // If close to waypoint, move to next
+            if (distance < 5.0f && waypointIdx < waypoints.size() - 1) {
+                waypointIdx++;
+                continue;
+            }
+
+            // Normalize error
+            float normErrorX = (distance > 0) ? errorX / distance : 0.0f;
+            float normErrorY = (distance > 0) ? errorY / distance : 0.0f;
+
+            // PD control for tilt (board coordinates)
+            float tiltX = kp * normErrorY - kd * ballVelY_local;
+            float tiltY = -kp * normErrorX + kd * ballVelX_local;
+
+            // Clamp tilt
+            tiltX = std::clamp(tiltX, -maxTilt, maxTilt);
+            tiltY = std::clamp(tiltY, -maxTilt, maxTilt);
+
+            // Convert to motor angles (apply gear ratio)
+            float motorAngleX = tiltX * gearRatio;
+            float motorAngleY = tiltY * gearRatio;
+
+            // Map to UART value (-64 to 63 mapped to 0-127)
+            int uartX = static_cast<int>(std::round(motorAngleX + 64));
+            int uartY = static_cast<int>(std::round(motorAngleY + 64));
+            uartX = std::clamp(uartX, 0, 127);
+            uartY = std::clamp(uartY, 0, 127);
+
+            // Send angles via UART
+            _uart.sendmsg(0, uartX);
+            _uart.sendmsg(1, uartY);
         }
 
-        // Send the angle to the UART
-        _uart.sendmsg(motor, angle);
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
 }
-
-s

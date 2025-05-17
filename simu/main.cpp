@@ -69,8 +69,21 @@ int main() {
     fs.release();
     std::cout << "Homography saved to homography.yml" << std::endl;
 
+    // Warp the image to crop and rectify the board area
+cv::Mat cropped;
+cv::warpPerspective(
+    img, cropped, H,
+     cv::Size(880, 880)
+);
+
+    // Optionally save or display the cropped image for verification
+    cv::imwrite("cropped_board.jpg", cropped);
+    cv::imshow("Cropped Board", cropped);
+    cv::waitKey(0);
+    cv::destroyAllWindows();
+
     // Pass the calibration image to the simulation
-    Updater updater(img);
+    Updater updater(cropped);
     updater.update();
 
     return 0;
