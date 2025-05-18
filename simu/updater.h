@@ -12,6 +12,7 @@
 #include <mutex>
 #include <atomic>
 #include <condition_variable>
+#include <fstream>
 
 #include "ball.h"
 #include "maze.h"
@@ -27,7 +28,8 @@ class Updater
     Ball _ball;
     Maze _maze;
     UARTcom _uart;
-    BallDetector _ballDetector{"/dev/video0"};
+    BallDetector _ballDetector{"/dev/video2"};
+    std::ofstream logFile;
 
     // Thread variables
     std::thread angleRX;

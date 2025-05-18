@@ -13,6 +13,9 @@ Updater::Updater(cv::Mat img)
         std::cout << "Warning: Failed to load font. Angle display will not be shown." << std::endl;
     }
 
+    logFile.open("updater_log.csv");
+    logFile << "timestamp_ms,real_x,real_y,pred_x,pred_y\n";
+
     // Create text for displaying angles
     _angleText.setFont(_font);
     _angleText.setCharacterSize(18);
@@ -37,6 +40,7 @@ Updater::~Updater() {
     if (physicsThread.joinable()) physicsThread.join();
     _ballDetector.running = false;
     if (ballDetect.joinable()) ballDetect.join();
+    if (logFile.is_open()) logFile.close();
 }
 
 void Updater::update(){
@@ -186,8 +190,17 @@ void Updater::cameraUpdate() {
         if (_ballDetector.getBallPosition(x, y)) {
             auto now = std::chrono::steady_clock::now();
             std::lock_guard<std::mutex> lock(dataMutex);
+
             receivedBallX = x;
             receivedBallY = y;
+
+            // Log prediction error to file
+            float predictedX = ballPosX_mm;
+            float predictedY = ballPosY_mm;
+            auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+            if (logFile.is_open()) {
+                logFile << ms << "," << x << "," << y << "," << predictedX << "," << predictedY << "\n";
+            }
 
             if (!first) {
                 float dx_mm = (x - prevX);
@@ -210,7 +223,7 @@ void Updater::cameraUpdate() {
             newDataAvailable = true;
             dataCondVar.notify_one();
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        std::this_thread::sleep_for(std::chrono::milliseconds(40));
     }
 }
 
