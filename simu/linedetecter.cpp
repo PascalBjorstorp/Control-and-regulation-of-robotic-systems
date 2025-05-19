@@ -1,6 +1,7 @@
 #include "linedetecter.h"
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 std::vector<cv::Vec3f> _SS_points;
 
 lineDetecter::lineDetecter(cv::Mat img): imageHandler(img) {
@@ -26,17 +27,23 @@ lineDetecter::lineDetecter(cv::Mat img): imageHandler(img) {
 
     //_SS_points = get_SS_points();
 =======
+=======
+>>>>>>> Stashed changes
 using namespace cv;
 
 lineDetecter::lineDetecter():imageHandler(imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/Cpp - Project/test_img_2.jpg", cv::IMREAD_COLOR)){
 
     _img = get_img();
     output = imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/Cpp - Project/test_img_2.jpg", cv::IMREAD_COLOR);
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
     detect_lines();
     sort();
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
     find_inters();
 
@@ -51,6 +58,8 @@ lineDetecter::lineDetecter():imageHandler(imread("/home/aksel/Documents/GitHub/C
             line(output, cv::Point(_inters[i].x, _inters[i].y), cv::Point(_inters[i+1].x, _inters[i+1].y), cv::Scalar(0,255,0), 5, cv::LINE_AA);
         }
 =======
+=======
+>>>>>>> Stashed changes
     // Draw the found lines
     for(size_t i = 0; i < _lines.size(); i++){
         line(output, cv::Point(_comp_path[i][0], _comp_path[i][1]), cv::Point(_comp_path[i][2], _comp_path[i][3]), cv::Scalar(0,0,255), 3, cv::LINE_AA);
@@ -126,6 +135,7 @@ int lineDetecter::find_start_line(){
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 void lineDetecter::sort_lines(const int start_id){
     std::vector<cv::Vec4i> sorted_lines, temp_lines = _lines;
     std::vector<cv::Vec4i> sorted_perps;
@@ -191,6 +201,8 @@ void lineDetecter::sort_lines(const int start_id){
     _lines = sorted_lines;
 }
 
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 int lineDetecter::calc_line_len(cv::Vec4i line){
@@ -287,6 +299,7 @@ void lineDetecter::detect_lines(){
     eliminate_overlap();
 }
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 cv::Vec4i lineDetecter::find_closest_pair(const cv::Vec4i line1, const cv::Vec4i line2){
 
@@ -442,6 +455,43 @@ int lineDetecter::calc_dist(Point p1, Point p2){
     int x = p2.x - p1.x;
     int y = p2.y - p1.y;
 
+=======
+Vec4i lineDetecter::find_end_line(std::vector<Vec4i> lines, std::vector<Vec3f> SS_points){
+
+    /*
+        Description:
+        Calculates and returns the element id of the first line segment in vector lines.
+        The first line segment is defined as the line segment closest to the start identifier
+    */
+    
+    Point end_pnt(SS_points[1][0], SS_points[1][1]);
+
+    int temp_id, dist1, dist2, min_dist = INT_MAX;
+
+    for(size_t i = 0; i < lines.size(); i++){
+        dist1 = calc_dist(end_pnt, Point(lines[i][0], lines[i][1]));
+        dist2 = calc_dist(end_pnt, Point(lines[i][2], lines[i][3]));
+
+        if((dist1 < min_dist) || (dist2 < min_dist)){
+            min_dist = (dist1 < dist2 ? dist1 : dist2);
+            temp_id = i;
+        }
+    }
+
+    return lines[temp_id];
+}
+
+int lineDetecter::calc_dist(Point p1, Point p2){
+    
+    /*
+        Description:
+        Calculates the distance between two points, and returns the calculated value.
+    */
+
+    int x = p2.x - p1.x;
+    int y = p2.y - p1.y;
+
+>>>>>>> Stashed changes
     int dist = sqrt((x*x)+(y*y));
 
     return dist;
@@ -489,11 +539,14 @@ double lineDetecter::calc_angle(const Vec4i line){
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 bool lineDetecter::corner_between(const cv::Vec4i line1, const cv::Vec4i line2, const int angle_limit){
     float angle = calc_angle(line1, line2);
 
     if((angle > angle_limit) && (angle < (180 - angle_limit))){
 =======
+=======
+>>>>>>> Stashed changes
 std::vector<Vec4i> lineDetecter::find_corner_lines(const Vec4i current_line, const std::vector<Vec4i> lines, double angle_threshold){
     std::vector<Vec4i> corner_lines;
 
@@ -617,6 +670,9 @@ Vec4i lineDetecter::orient(Vec4i line, Vec4i next_line){
 bool lineDetecter::check_end(Vec4i line, Vec4i end_line){
 
     if(line == end_line || line == Vec4i(end_line[2], end_line[3], end_line[0], end_line[1])){
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         return true;
     }
@@ -1012,6 +1068,7 @@ cv::Point lineDetecter::calc_inter(const cv::Vec4i line1, const cv::Vec4i line2)
     return cv::Point(line1_start.x + t * dir_line1.x, line1_start.y + t * dir_line1.y);
 }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 void lineDetecter::find_inters(){
     cv::Point inter;
@@ -1151,5 +1208,7 @@ void lineDetecter::onMouse(int event, int x, int y, int, void*) {
         std::cout << "Clicked: " << x << ", " << y << std::endl;
     }
 }
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

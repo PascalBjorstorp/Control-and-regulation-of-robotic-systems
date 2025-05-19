@@ -94,6 +94,9 @@
         "format": "cpp",
         "span": "cpp",
         "text_encoding": "cpp"
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     }
 }

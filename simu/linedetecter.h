@@ -84,6 +84,7 @@ public:
     bool corner_between(const Vec4i line1, const Vec4i line2, const int angle_limit);
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     bool corner_between(const cv::Vec4i line1, const cv::Vec4i line2, const int angle_limit);
 
     cv::Vec4i extend_line(const cv::Vec4i line, const float scale);
@@ -103,6 +104,9 @@ public:
     static void onMouse(int event, int x, int y, int, void*);
 
     std::vector<cv::Point> get_inters() { return _inters; }
+=======
+    int calc_dist(Point p1, Point p2);
+>>>>>>> Stashed changes
 =======
     int calc_dist(Point p1, Point p2);
 >>>>>>> Stashed changes

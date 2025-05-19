@@ -1,6 +1,10 @@
 # This is the CMakeCache file.
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # For build in directory: /home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build
+=======
+# For build in directory: /home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build
+>>>>>>> Stashed changes
 =======
 # For build in directory: /home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build
 >>>>>>> Stashed changes
@@ -20,7 +24,11 @@
 
 //Value Computed by CMake
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 BallMazeGame_BINARY_DIR:STATIC=/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build
+=======
+BallMazeGame_BINARY_DIR:STATIC=/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build
+>>>>>>> Stashed changes
 =======
 BallMazeGame_BINARY_DIR:STATIC=/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build
 >>>>>>> Stashed changes
@@ -30,6 +38,7 @@ BallMazeGame_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 BallMazeGame_SOURCE_DIR:STATIC=/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu
 
 //Path to a program.
@@ -38,6 +47,8 @@ CMAKE_ADDR2LINE:FILEPATH=/usr/bin/addr2line
 //Path to a program.
 CMAKE_AR:FILEPATH=/usr/bin/ar
 =======
+=======
+>>>>>>> Stashed changes
 BallMazeGame_SOURCE_DIR:STATIC=/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu
 
 //Path to a program.
@@ -45,12 +56,16 @@ CMAKE_ADDR2LINE:FILEPATH=/usr/bin/llvm-addr2line-16
 
 //Path to a program.
 CMAKE_AR:FILEPATH=/usr/bin/llvm-ar-16
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 //No help, variable specified on the command line.
 CMAKE_BUILD_TYPE:STRING=Debug
 
 //No help, variable specified on the command line.
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/g++
 
@@ -62,6 +77,8 @@ CMAKE_CXX_COMPILER_AR:FILEPATH=/usr/bin/gcc-ar-11
 // for the GCC compiler
 CMAKE_CXX_COMPILER_RANLIB:FILEPATH=/usr/bin/gcc-ranlib-11
 =======
+=======
+>>>>>>> Stashed changes
 CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/clang++-16
 
 //LLVM archiver
@@ -72,6 +89,9 @@ CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS:FILEPATH=CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-N
 
 //Generate index for LLVM archive
 CMAKE_CXX_COMPILER_RANLIB:FILEPATH=/usr/bin/llvm-ranlib-16
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 //Flags used by the CXX compiler during all build types.
@@ -91,6 +111,7 @@ CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //No help, variable specified on the command line.
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 CMAKE_C_COMPILER:FILEPATH=/usr/bin/gcc
 
 //A wrapper around 'ar' adding the appropriate '--plugin' option
@@ -101,6 +122,8 @@ CMAKE_C_COMPILER_AR:FILEPATH=/usr/bin/gcc-ar-11
 // for the GCC compiler
 CMAKE_C_COMPILER_RANLIB:FILEPATH=/usr/bin/gcc-ranlib-11
 =======
+=======
+>>>>>>> Stashed changes
 CMAKE_C_COMPILER:FILEPATH=/usr/bin/clang-16
 
 //LLVM archiver
@@ -111,6 +134,9 @@ CMAKE_C_COMPILER_CLANG_SCAN_DEPS:FILEPATH=CMAKE_C_COMPILER_CLANG_SCAN_DEPS-NOTFO
 
 //Generate index for LLVM archive
 CMAKE_C_COMPILER_RANLIB:FILEPATH=/usr/bin/llvm-ranlib-16
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 //Flags used by the C compiler during all build types.
@@ -130,7 +156,11 @@ CMAKE_C_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //Path to a program.
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 CMAKE_DLLTOOL:FILEPATH=CMAKE_DLLTOOL-NOTFOUND
+=======
+CMAKE_DLLTOOL:FILEPATH=/usr/bin/llvm-dlltool-16
+>>>>>>> Stashed changes
 =======
 CMAKE_DLLTOOL:FILEPATH=/usr/bin/llvm-dlltool-16
 >>>>>>> Stashed changes
@@ -154,6 +184,12 @@ CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+//Value Computed by CMake.
+CMAKE_FIND_PACKAGE_REDIRECTS_DIR:STATIC=/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build/CMakeFiles/pkgRedirects
+
+>>>>>>> Stashed changes
 =======
 //Value Computed by CMake.
 CMAKE_FIND_PACKAGE_REDIRECTS_DIR:STATIC=/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build/CMakeFiles/pkgRedirects
@@ -190,6 +226,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
 //Path to a program.
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 CMAKE_NM:FILEPATH=/usr/bin/nm
 
 //Path to a program.
@@ -198,6 +235,8 @@ CMAKE_OBJCOPY:FILEPATH=/usr/bin/objcopy
 //Path to a program.
 CMAKE_OBJDUMP:FILEPATH=/usr/bin/objdump
 =======
+=======
+>>>>>>> Stashed changes
 CMAKE_NM:FILEPATH=/usr/bin/llvm-nm-16
 
 //Path to a program.
@@ -205,6 +244,9 @@ CMAKE_OBJCOPY:FILEPATH=/usr/bin/llvm-objcopy-16
 
 //Path to a program.
 CMAKE_OBJDUMP:FILEPATH=/usr/bin/llvm-objdump-16
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 //Value Computed by CMake
@@ -218,15 +260,21 @@ CMAKE_PROJECT_NAME:STATIC=BallMazeGame
 
 //Path to a program.
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
 
 //Path to a program.
 CMAKE_READELF:FILEPATH=/usr/bin/readelf
 =======
+=======
+>>>>>>> Stashed changes
 CMAKE_RANLIB:FILEPATH=/usr/bin/llvm-ranlib-16
 
 //Path to a program.
 CMAKE_READELF:FILEPATH=/usr/bin/llvm-readelf-16
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 //Flags used by the linker during the creation of shared libraries
@@ -278,12 +326,18 @@ CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
 //Path to a program.
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 CMAKE_STRIP:FILEPATH=/usr/bin/strip
 =======
+=======
+>>>>>>> Stashed changes
 CMAKE_STRIP:FILEPATH=/usr/bin/llvm-strip-16
 
 //Path to a program.
 CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 //If this value is on, makefiles will be generated without the
@@ -293,6 +347,7 @@ CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 //The directory containing a CMake configuration file for OpenCV.
 OpenCV_DIR:PATH=/usr/local/lib/cmake/opencv4
 
@@ -301,6 +356,10 @@ SFML_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/SFML
 
 //Path to a file.
 SFML_DOC_DIR:PATH=SFML_DOC_DIR-NOTFOUND
+=======
+//The directory containing a CMake configuration file for SFML.
+SFML_DIR:PATH=SFML_DIR-NOTFOUND
+>>>>>>> Stashed changes
 =======
 //The directory containing a CMake configuration file for SFML.
 SFML_DIR:PATH=SFML_DIR-NOTFOUND
@@ -317,6 +376,7 @@ CMAKE_ADDR2LINE-ADVANCED:INTERNAL=1
 CMAKE_AR-ADVANCED:INTERNAL=1
 //This is the directory where this CMakeCache.txt was created
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 CMAKE_CACHEFILE_DIR:INTERNAL=/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build
 //Major version of cmake used to create the current loaded cache
 CMAKE_CACHE_MAJOR_VERSION:INTERNAL=3
@@ -325,6 +385,8 @@ CMAKE_CACHE_MINOR_VERSION:INTERNAL=22
 //Patch version of cmake used to create the current loaded cache
 CMAKE_CACHE_PATCH_VERSION:INTERNAL=1
 =======
+=======
+>>>>>>> Stashed changes
 CMAKE_CACHEFILE_DIR:INTERNAL=/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build
 //Major version of cmake used to create the current loaded cache
 CMAKE_CACHE_MAJOR_VERSION:INTERNAL=3
@@ -332,6 +394,9 @@ CMAKE_CACHE_MAJOR_VERSION:INTERNAL=3
 CMAKE_CACHE_MINOR_VERSION:INTERNAL=28
 //Patch version of cmake used to create the current loaded cache
 CMAKE_CACHE_PATCH_VERSION:INTERNAL=3
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 //Path to CMake executable.
 CMAKE_COMMAND:INTERNAL=/usr/bin/cmake
@@ -344,6 +409,11 @@ CMAKE_CXX_COMPILER-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_COMPILER_AR
 CMAKE_CXX_COMPILER_AR-ADVANCED:INTERNAL=1
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+//ADVANCED property for variable: CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS
+CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-ADVANCED:INTERNAL=1
+>>>>>>> Stashed changes
 =======
 //ADVANCED property for variable: CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS
 CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-ADVANCED:INTERNAL=1
@@ -365,6 +435,11 @@ CMAKE_C_COMPILER-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_COMPILER_AR
 CMAKE_C_COMPILER_AR-ADVANCED:INTERNAL=1
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+//ADVANCED property for variable: CMAKE_C_COMPILER_CLANG_SCAN_DEPS
+CMAKE_C_COMPILER_CLANG_SCAN_DEPS-ADVANCED:INTERNAL=1
+>>>>>>> Stashed changes
 =======
 //ADVANCED property for variable: CMAKE_C_COMPILER_CLANG_SCAN_DEPS
 CMAKE_C_COMPILER_CLANG_SCAN_DEPS-ADVANCED:INTERNAL=1
@@ -408,7 +483,11 @@ CMAKE_GENERATOR_TOOLSET:INTERNAL=
 //Source directory with the top level CMakeLists.txt file for this
 // project
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 CMAKE_HOME_DIRECTORY:INTERNAL=/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu
+=======
+CMAKE_HOME_DIRECTORY:INTERNAL=/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu
+>>>>>>> Stashed changes
 =======
 CMAKE_HOME_DIRECTORY:INTERNAL=/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu
 >>>>>>> Stashed changes
@@ -444,7 +523,11 @@ CMAKE_RANLIB-ADVANCED:INTERNAL=1
 CMAKE_READELF-ADVANCED:INTERNAL=1
 //Path to CMake installation.
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 CMAKE_ROOT:INTERNAL=/usr/share/cmake-3.22
+=======
+CMAKE_ROOT:INTERNAL=/usr/share/cmake-3.28
+>>>>>>> Stashed changes
 =======
 CMAKE_ROOT:INTERNAL=/usr/share/cmake-3.28
 >>>>>>> Stashed changes
@@ -475,6 +558,11 @@ CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_STRIP
 CMAKE_STRIP-ADVANCED:INTERNAL=1
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+//ADVANCED property for variable: CMAKE_TAPI
+CMAKE_TAPI-ADVANCED:INTERNAL=1
+>>>>>>> Stashed changes
 =======
 //ADVANCED property for variable: CMAKE_TAPI
 CMAKE_TAPI-ADVANCED:INTERNAL=1
@@ -484,8 +572,13 @@ CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 //Details about finding OpenCV
 FIND_PACKAGE_MESSAGE_DETAILS_OpenCV:INTERNAL=[/usr/local][v4.12.0()]
+=======
+//linker supports push/pop state
+_CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
+>>>>>>> Stashed changes
 =======
 //linker supports push/pop state
 _CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
