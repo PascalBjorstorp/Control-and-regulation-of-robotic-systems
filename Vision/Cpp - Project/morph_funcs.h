@@ -10,6 +10,6 @@
 
 using namespace cv;
 
-Mat perform_skeletonization(const Mat img);
+Mat perform_skeletonization(const Mat img, const int threshold_value);
 
 void perform_dilate(Mat& img);

@@ -1,7 +1,7 @@
 #include "morph_funcs.h"
 
-Mat perform_skeletonization(const Mat img){
-    threshold(img, img, 145, 255, THRESH_BINARY_INV);
+Mat perform_skeletonization(const Mat img, const int threshold_value){
+    threshold(img, img, threshold_value, 255, THRESH_BINARY_INV);
 
     //Declare variables with correct color channels - 8 bit 1 color
     Mat skel(Mat::zeros(img.size(), CV_8UC1)), temp(Mat::zeros(img.size(), CV_8UC1)), eroded(Mat::zeros(img.size(), CV_8UC1));
