@@ -18,8 +18,8 @@ bool BallDetector::getBallPosition(float& x, float& y) {
     std::lock_guard<std::mutex> lock(posMutex);
     if(!hasBall) return false;
 
-    x = _ballX / 4; 
-    y = _ballY / 4;
+    x = _ballX / 8;
+    y = _ballY / 8;
     
     return true;
 }

@@ -139,8 +139,8 @@ void Updater::physicsUpdate() {
             ballPosY_mm = ballY_mm;
         }
 
-        float ballX = ((ballPosX_mm * 4.0f) - Constants::WALL_LENGTH / 2);
-        float ballY = ((ballPosY_mm * 4.0f) - Constants::WALL_LENGTH / 2);
+        float ballX = ((ballPosX_mm * 8.0f) - Constants::WALL_LENGTH / 2);
+        float ballY = ((ballPosY_mm * 8.0f) - Constants::WALL_LENGTH / 2);
 
         {
             std::lock_guard<std::mutex> lock(dataMutex);
