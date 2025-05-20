@@ -1,57 +1,68 @@
 [
 {
-  "directory": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
-  "command": "/usr/bin/g++ -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/main.cpp.o -c /home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/main.cpp",
-  "file": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/main.cpp"
+  "directory": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
+  "command": "/usr/bin/clang++-16 -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/main.cpp.o -c /home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/main.cpp",
+  "file": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/main.cpp",
+  "output": "CMakeFiles/BallMazeGame.dir/main.cpp.o"
 },
 {
-  "directory": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
-  "command": "/usr/bin/g++ -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/ball.cpp.o -c /home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/ball.cpp",
-  "file": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/ball.cpp"
+  "directory": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
+  "command": "/usr/bin/clang++-16 -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/ball.cpp.o -c /home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/ball.cpp",
+  "file": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/ball.cpp",
+  "output": "CMakeFiles/BallMazeGame.dir/ball.cpp.o"
 },
 {
-  "directory": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
-  "command": "/usr/bin/g++ -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/wall.cpp.o -c /home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/wall.cpp",
-  "file": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/wall.cpp"
+  "directory": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
+  "command": "/usr/bin/clang++-16 -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/wall.cpp.o -c /home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/wall.cpp",
+  "file": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/wall.cpp",
+  "output": "CMakeFiles/BallMazeGame.dir/wall.cpp.o"
 },
 {
-  "directory": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
-  "command": "/usr/bin/g++ -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/point3d.cpp.o -c /home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/point3d.cpp",
-  "file": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/point3d.cpp"
+  "directory": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
+  "command": "/usr/bin/clang++-16 -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/point3d.cpp.o -c /home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/point3d.cpp",
+  "file": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/point3d.cpp",
+  "output": "CMakeFiles/BallMazeGame.dir/point3d.cpp.o"
 },
 {
-  "directory": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
-  "command": "/usr/bin/g++ -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/maze.cpp.o -c /home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/maze.cpp",
-  "file": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/maze.cpp"
+  "directory": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
+  "command": "/usr/bin/clang++-16 -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/maze.cpp.o -c /home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/maze.cpp",
+  "file": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/maze.cpp",
+  "output": "CMakeFiles/BallMazeGame.dir/maze.cpp.o"
 },
 {
-  "directory": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
-  "command": "/usr/bin/g++ -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/motor.cpp.o -c /home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/motor.cpp",
-  "file": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/motor.cpp"
+  "directory": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
+  "command": "/usr/bin/clang++-16 -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/motor.cpp.o -c /home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/motor.cpp",
+  "file": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/motor.cpp",
+  "output": "CMakeFiles/BallMazeGame.dir/motor.cpp.o"
 },
 {
-  "directory": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
-  "command": "/usr/bin/g++ -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/updater.cpp.o -c /home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/updater.cpp",
-  "file": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/updater.cpp"
+  "directory": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
+  "command": "/usr/bin/clang++-16 -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/updater.cpp.o -c /home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/updater.cpp",
+  "file": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/updater.cpp",
+  "output": "CMakeFiles/BallMazeGame.dir/updater.cpp.o"
 },
 {
-  "directory": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
-  "command": "/usr/bin/g++ -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/imagehandler.cpp.o -c /home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/imagehandler.cpp",
-  "file": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/imagehandler.cpp"
+  "directory": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
+  "command": "/usr/bin/clang++-16 -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/imagehandler.cpp.o -c /home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/imagehandler.cpp",
+  "file": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/imagehandler.cpp",
+  "output": "CMakeFiles/BallMazeGame.dir/imagehandler.cpp.o"
 },
 {
-  "directory": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
-  "command": "/usr/bin/g++ -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/linedetecter.cpp.o -c /home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/linedetecter.cpp",
-  "file": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/linedetecter.cpp"
+  "directory": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
+  "command": "/usr/bin/clang++-16 -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/linedetecter.cpp.o -c /home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/linedetecter.cpp",
+  "file": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/linedetecter.cpp",
+  "output": "CMakeFiles/BallMazeGame.dir/linedetecter.cpp.o"
 },
 {
-  "directory": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
-  "command": "/usr/bin/g++ -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/ballDetector.cpp.o -c /home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/ballDetector.cpp",
-  "file": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/ballDetector.cpp"
+  "directory": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
+  "command": "/usr/bin/clang++-16 -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/ballDetector.cpp.o -c /home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/ballDetector.cpp",
+  "file": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/ballDetector.cpp",
+  "output": "CMakeFiles/BallMazeGame.dir/ballDetector.cpp.o"
 },
 {
-  "directory": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
-  "command": "/usr/bin/g++ -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/uartcom.cpp.o -c /home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/uartcom.cpp",
-  "file": "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/uartcom.cpp"
+  "directory": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build",
+  "command": "/usr/bin/clang++-16 -isystem /usr/local/include/opencv4 -g -std=gnu++17 -o CMakeFiles/BallMazeGame.dir/uartcom.cpp.o -c /home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/uartcom.cpp",
+  "file": "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/uartcom.cpp",
+  "output": "CMakeFiles/BallMazeGame.dir/uartcom.cpp.o"
 }
 ]

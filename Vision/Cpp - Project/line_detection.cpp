@@ -445,7 +445,7 @@ Vec4i orient(Vec4i line, Vec4i next_line){
     return next_line;
 }
 
-bool is_line_between(const Vec4i& line1, const Vec4i& line2, const Vec4i& candidate_line) {
+bool is_line_between(const Vec4i line1, const Vec4i line2, const Vec4i candidate_line, std::vector<Vec4i> lines, Mat img, int tolerance = 15){
     // Extract points from the lines
     Point line1_start(line1[0], line1[1]);
     Point line1_end(line1[2], line1[3]);
@@ -459,25 +459,35 @@ bool is_line_between(const Vec4i& line1, const Vec4i& line2, const Vec4i& candid
     Point cand_mid((cand_start.x + cand_end.x) / 2, (cand_start.y + cand_end.y) / 2);
 
     // Calculate the bounding box formed by line1 and line2
-    int x_min = std::min({line1_start.x, line1_end.x, line2_start.x, line2_end.x});
-    int x_max = std::max({line1_start.x, line1_end.x, line2_start.x, line2_end.x});
-    int y_min = std::min({line1_start.y, line1_end.y, line2_start.y, line2_end.y});
-    int y_max = std::max({line1_start.y, line1_end.y, line2_start.y, line2_end.y});
+    int x_min = std::min({line1_start.x, line1_end.x, line2_start.x, line2_end.x}) - tolerance;
+    int x_max = std::max({line1_start.x, line1_end.x, line2_start.x, line2_end.x}) + tolerance;
+    int y_min = std::min({line1_start.y, line1_end.y, line2_start.y, line2_end.y}) - tolerance;
+    int y_max = std::max({line1_start.y, line1_end.y, line2_start.y, line2_end.y}) + tolerance;
 
     // Check if any of the candidate line's points (start, end, or midpoint) lie within the bounding box
-    if ((cand_start.x >= x_min && cand_start.x <= x_max && cand_start.y >= y_min && cand_start.y <= y_max) ||
-        (cand_end.x >= x_min && cand_end.x <= x_max && cand_end.y >= y_min && cand_end.y <= y_max) ||
-        (cand_mid.x >= x_min && cand_mid.x <= x_max && cand_mid.y >= y_min && cand_mid.y <= y_max)) {
-        return true; // Candidate line has at least one point within the bounding box
+    if ((cand_mid.x >= x_min && cand_mid.x <= x_max && cand_mid.y >= y_min && cand_mid.y <= y_max)) {
+
+        //line(img, Point(x_min, y_min), Point(x_min, y_max), Scalar(0, 255, 0), 2);
+        //line(img, Point(x_min, y_max), Point(x_max, y_max), Scalar(0, 255, 0), 2);
+        //line(img, Point(x_max, y_max), Point(x_max, y_min), Scalar(0, 255, 0), 2);
+        //line(img, Point(x_max, y_min), Point(x_min, y_min), Scalar(0, 255, 0), 2);
+
+        Vec4i temp_line = closest_line(line1, lines);
+
+        // Make sure the candidate line is the line which we are trying to add. If lines are not same angle, it can cause issues.
+        if((candidate_line == temp_line) && (line1 != temp_line) && (line1 != Vec4i(temp_line[2], temp_line[3], temp_line[0], temp_line[1])) && (line2 != temp_line) && (line2 != Vec4i(temp_line[2], temp_line[3], temp_line[0], temp_line[1]))){
+            return true;
+        }
     }
 
     return false; // Candidate line does not have any points between line1 and line2
 }
 
-Vec4i find_line_between(const Vec4i& line1, const Vec4i& line2, const std::vector<Vec4i>& lines){
-    for(const auto& candidate_line : lines){
+Vec4i find_line_between(const Vec4i line1, const Vec4i line2, const std::vector<Vec4i> lines, Mat img){
+    
+    for(const auto candidate_line : lines){
         // Check if the candidate line is between line1 and line2
-        if(is_line_between(line1, line2, candidate_line)){
+        if(is_line_between(line1, line2, candidate_line, lines, img)){
             return candidate_line; // Return the first line found that is between line1 and line2
         }
     }
@@ -486,7 +496,7 @@ Vec4i find_line_between(const Vec4i& line1, const Vec4i& line2, const std::vecto
     return Vec4i(-1, -1, -1, -1);
 }
 
-std::pair<double, int> corner_check(const Vec4i& trgt_line, const std::vector<Vec4i>& lines){
+std::pair<double, int> corner_check(const Vec4i trgt_line, const std::vector<Vec4i> lines){
     std::vector<Vec4i> lines_opp_angle = find_corner_lines(trgt_line, lines);
     std::vector<Vec4i> intersecting_lines = find_intersecting_lines(trgt_line, lines_opp_angle);
     std::vector<std::pair<double, int>> closest_intersections; // Stores distance and line ID
@@ -499,8 +509,6 @@ std::pair<double, int> corner_check(const Vec4i& trgt_line, const std::vector<Ve
         if((trgt_line == lines[i]) || (lines[i] == Vec4i(trgt_line[2], trgt_line[3], trgt_line[0], trgt_line[1]))){
             continue; // Skip the current line itself
         }
-
-        // SHOULD HAVE MINIMUM VALUE OF INTERSECTION DISTANCE, BUT SHOULD EVALUATE ACCORDING TO THE DISTANCE BETWEEN LINES
 
         // Calculate the intersection point
         Point intersection = calc_inter(trgt_line, intersecting_lines[i]);
@@ -533,15 +541,8 @@ std::pair<double, int> corner_check(const Vec4i& trgt_line, const std::vector<Ve
     return closest_intersections[0];
 }
 
-bool check_end(Vec4i line, Vec4i end_line){
-    //std::cout << "end dist: " << calc_dist(Point(line[2], line[3]), Point(SS_points[1][0], SS_points[1][1])) << std::endl;
-
-    /*if(calc_dist(Point(line[2], line[3]), Point(SS_points[1][0], SS_points[1][1])) < 200){
-        std::cout << "should end now" << std::endl;
-        return true;
-    }*/
-
-    if(line == end_line || line == Vec4i(end_line[2], end_line[3], end_line[0], end_line[1])){
+bool check_end(Vec4i line, std::vector<Vec3f> SS_points){
+    if(calc_dist(Point(line[2], line[3]), Point(SS_points[1][0], SS_points[1][1])) < 150){
         return true;
     }
 
@@ -549,12 +550,6 @@ bool check_end(Vec4i line, Vec4i end_line){
 }
 
 Vec4i find_end_line(std::vector<Vec4i> lines, std::vector<Vec3f> SS_points){
-
-    /*
-        Description:
-        Calculates and returns the element id of the first line segment in vector lines.
-        The first line segment is defined as the line segment closest to the start identifier
-    */
     
     Point end_pnt(SS_points[1][0], SS_points[1][1]);
 
@@ -575,26 +570,19 @@ Vec4i find_end_line(std::vector<Vec4i> lines, std::vector<Vec3f> SS_points){
 
 std::vector<Vec4i> sort(std::vector<Vec4i> lines, const std::vector<Vec3f> SS_points, Mat img){
     std::vector<Vec4i> temp_lines, result;
-    Vec4i new_trgt, trgt_line, temp_line, end_line = find_end_line(lines, SS_points);
+    Vec4i new_trgt, trgt_line, temp_line, line_between, end_line = find_end_line(lines, SS_points);
     std::pair<Vec4i, double> temp_pair;
     std::pair<double, int> inter_pair;
     double end_dist;
+    bool remove_line = false;
+    int prev_result_size = 0, counter = 0;
 
     int start_id = find_start_line(lines, SS_points), full = lines.size();
 
-    // Make sure the starting line is oriented correctly
-    if(calc_dist(Point(lines[start_id][2], lines[start_id][3]), Point(SS_points[0][0],SS_points[0][1])) < calc_dist(Point(lines[start_id][0], lines[start_id][1]), Point(SS_points[0][0],SS_points[0][1]))){
-        double temp = lines[start_id][2];
-        lines[start_id][2] = lines[start_id][0];
-        lines[start_id][0] = temp;
+    // Orient the starting line
+    result.push_back(orient(Vec4i(0, 0, SS_points[0][0], SS_points[0][1]), lines[start_id]));
 
-        temp = lines[start_id][3];
-        lines[start_id][3] = lines[start_id][1];
-        lines[start_id][1] = temp;
-    }
-
-    result.push_back(lines[start_id]);
-
+    // Remove it from lines vector
     lines.erase(lines.begin() + start_id);
 
     do{
@@ -604,7 +592,6 @@ std::vector<Vec4i> sort(std::vector<Vec4i> lines, const std::vector<Vec3f> SS_po
             imshow("sort", img);
         }
 
-        //From here should use the back elemestd::cout << "test3" << std::endl;nt of the result vector for trgt line. Because the line is removed in lines
         trgt_line = result.back();
 
         line(img, Point(trgt_line[0], trgt_line[1]), Point(trgt_line[2], trgt_line[3]), Scalar(0,255,0), 3, LINE_AA);
@@ -612,28 +599,31 @@ std::vector<Vec4i> sort(std::vector<Vec4i> lines, const std::vector<Vec3f> SS_po
         if(lines.size() > 1){
             inter_pair = corner_check(trgt_line, lines);
 
-            // If a intersection point is found within 50 units of the target line, then there is a corner
-            // And no further processing is needed
+            // If a intersection point is found within 100 units of the target line, then there is a corner
             if((inter_pair.first != -1) && (inter_pair.first < 100)){
                 temp_line = orient(trgt_line, lines[inter_pair.second]);
 
                 result.push_back(temp_line);
+
+                line(img, Point(temp_line[0], temp_line[1]), Point(temp_line[2], temp_line[3]), Scalar(0,0,255), 3, LINE_AA);
+
+                namedWindow("sort", WINDOW_NORMAL);
+                imshow("sort", img);
+                waitKey(0);
+
                 lines.erase(lines.begin() + return_id(temp_line, lines));
 
-                if(check_end(temp_line, end_line)){
+                if(check_end(temp_line, SS_points)){
                     break;
                 }
-
-                continue;
+                else{
+                    trgt_line = result.back();
+                }
             }
         }
 
         temp_lines = find_lines_with_similar_angle(trgt_line, lines);
 
-        /*
-            Check which of the lines with similar angles are close. if multiple lines are under some value, like 30
-            away from the current line's end point, then extend the line, and check if which line is now closest
-        */
         for(size_t j = 0; j < temp_lines.size(); j++){
             line(img, Point(temp_lines[j][0], temp_lines[j][1]), Point(temp_lines[j][2], temp_lines[j][3]), Scalar(255,0,0), 3, LINE_AA);
 
@@ -643,7 +633,7 @@ std::vector<Vec4i> sort(std::vector<Vec4i> lines, const std::vector<Vec3f> SS_po
 
         waitKey(0);
 
-        temp_lines = within_prox(trgt_line, temp_lines, 400);
+        temp_lines = within_prox(trgt_line, temp_lines, 350);
 
         if(temp_lines.size() != 0){
             for(size_t i = 0; i < temp_lines.size(); i++){
@@ -655,7 +645,7 @@ std::vector<Vec4i> sort(std::vector<Vec4i> lines, const std::vector<Vec3f> SS_po
 
             waitKey(0);
 
-            temp_pair = ex_closest_line(trgt_line, temp_lines, 1.2);
+            temp_pair = ex_closest_line(trgt_line, temp_lines, 1.1);
 
             double comp_dist = closest_dist(trgt_line, lines);
 
@@ -670,34 +660,14 @@ std::vector<Vec4i> sort(std::vector<Vec4i> lines, const std::vector<Vec3f> SS_po
                 new_trgt = orient(trgt_line, new_trgt);
                 result.push_back(new_trgt);
             }
-        }
-        // No lines with the same angle was found within the proximity range.
-        else{
 
-            if(lines.size() != 0){
-                // Check for lines with similar angles within all of the remaining lines
-                temp_lines = find_lines_with_similar_angle(trgt_line, lines);
-
-                // Check if any lines can intersect with the current line - Checks for corners
-                temp_lines = find_intersecting_lines(trgt_line, temp_lines);
+            if(check_end(new_trgt, SS_points)){
+                break;
             }
             else{
-                temp_lines.clear();
+                trgt_line = result.back();
+                remove_line = true;
             }
-
-            // If any lines can intersect, then find the closest line
-            if(temp_lines.size() != 0){
-                new_trgt = closest_line(trgt_line, temp_lines);
-            }
-            // If no lines can intersect, then find the line (of the remaining) which is closest
-            else{
-                new_trgt = closest_line(trgt_line, lines);
-                //temp_pair = ex_closest_line(trgt_line, lines, 1.0, img, true);
-                //new_trgt = temp_pair.first;
-            }
-
-            new_trgt = orient(trgt_line, new_trgt);
-            result.push_back(new_trgt);
         }
 
         line(img, Point(new_trgt[0], new_trgt[1]), Point(new_trgt[2], new_trgt[3]), Scalar(255,255,255), 3, LINE_AA);
@@ -705,34 +675,74 @@ std::vector<Vec4i> sort(std::vector<Vec4i> lines, const std::vector<Vec3f> SS_po
         namedWindow("sort", WINDOW_NORMAL);
         imshow("sort", img);
 
-        waitKey(0);
-
-        lines.erase(lines.begin() + return_id(new_trgt, lines));
-
-        if(check_end(new_trgt, end_line)){
-            break;
-        }
-        continue;
-
         if(result.size() >= 2){
-            Vec4i line_between = find_line_between(result[result.size()-2], result.back(), lines);
+
+            Vec4i line_between = find_line_between(result[result.size()-2], result[result.size()-1], lines, img);
 
             if(line_between != Vec4i(-1, -1, -1, -1)){
 
+                line(img, Point(line_between[0], line_between[1]), Point(line_between[2], line_between[3]), Scalar(0,0,255), 3, LINE_AA);
+
+                namedWindow("sort", WINDOW_NORMAL);
+                imshow("sort", img);
+                waitKey(0);
+
                 line_between = orient(result[result.size()-2], line_between);
 
-                result.push_back(line_between);
-
-                temp_line = result[result.size()-2];
-                result[result.size()-2] = line_between;
-                result[result.size()-1] = temp_line;
+                temp_line = result[result.size()-1];
+                result[result.size()-1] = line_between;
+                result.push_back(temp_line);
 
                 lines.erase(lines.begin() + return_id(line_between, lines));
             }
         }
 
+        if(remove_line){
+
+            line(img, Point(trgt_line[0], trgt_line[1]), Point(trgt_line[2], trgt_line[3]), Scalar(0,0,255), 3, LINE_AA);
+
+            namedWindow("sort", WINDOW_NORMAL);
+            imshow("sort", img);
+            waitKey(0);
+
+            lines.erase(lines.begin() + return_id(trgt_line, lines));
+            remove_line = false;
+        }
+
+        namedWindow("sort", WINDOW_NORMAL);
+        imshow("sort", img);
+
+        waitKey(0);
+
+        if(check_end(new_trgt, SS_points)){
+            break;
+        }
+        else{
+            if(result.size() == prev_result_size){
+                counter++;
+            }
+            else{
+                counter = 0;
+                prev_result_size = result.size();
+            }
+
+            if(counter == 3){
+                break;
+            }
+        }
         
     }while(lines.size() != 0);
+
+    for(int i = 0; i < result.size(); i++){
+        line(img, Point(result[i][0], result[i][1]), Point(result[i][2], result[i][3]), Scalar(0,0,255), 3, LINE_AA);
+        circle(img, Point(result[i][0], result[i][1]), 5, Scalar(0,255,0), -1);
+        circle(img, Point(result[i][2], result[i][3]), 5, Scalar(0,0,255), -1);
+
+        namedWindow("sort", WINDOW_NORMAL);
+        imshow("sort", img);
+
+        waitKey(0);
+    }
 
     std::vector<Point> corners;
 
@@ -835,7 +845,6 @@ Vec4i extend_line(const Vec4i line, const float scale){
     Point new_end = line_end + scaled_dir;
 
     // Return the extended line
-    //return Vec4i(new_start.x, new_start.y, new_end.x, new_end.y);
     return Vec4i(line_start.x, line_start.y, new_end.x, new_end.y);
 }
 

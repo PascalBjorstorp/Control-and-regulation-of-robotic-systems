@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <cmath>
 
@@ -99,6 +100,22 @@ bool is_line_outside_scope(const Vec4i& line, const vector<Vec4i>& other_lines, 
     return min_distance > threshold;
 }
 
+std::vector<Point> man_points;
+std::vector<Point> test_SS_Points;
+
+void onMouse(int event, int x, int y, int flags, void* userdata) {
+    if (event == EVENT_LBUTTONDOWN) {
+
+        if(test_SS_Points.size() < 2){
+            test_SS_Points.push_back(Point(x, y));
+        }
+        else{
+            man_points.push_back(Point(x, y));
+            std::cout << man_points.size() << std::endl;
+        }
+    }
+}
+
 int main(int argc, char** argv) 
 { 
     Mat img = imread("/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/TestPic/Cropped_board1.jpg", IMREAD_COLOR); 
@@ -112,7 +129,7 @@ int main(int argc, char** argv)
     }
 
     // Initialize vector which will hold "lines" - coordinates for start and end points.
-    std::vector<Vec4i> lines;
+    std::vector<Vec4i> lines, man_lines;
 
     std::vector<Point> inters;
 
@@ -125,6 +142,11 @@ int main(int argc, char** argv)
 
     std::vector<Vec3f> SS_points;
 
+    std::ofstream outFile("/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/data.txt", std::ios::out);
+    double avg_dist;
+
+    std::cout << "test1" << std::endl;
+
     for(int i = 1; i < 6; i++){
 
         SS_points.clear();
@@ -134,60 +156,88 @@ int main(int argc, char** argv)
         String id = "Cropped_board" + to_string(i); 
 
         String fileName = "/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/TestPic/" + id + ".jpg";
-        cout << "------ " << id << " ------" << endl;
+        if(outFile.is_open()){
+            outFile << "------ " << id << " ------" << endl;
+        }
+        else{
+            std::cout << "Unable to open file" << std::endl;
+        }
+
+        std::cout << "test2" << std::endl;
 
         img = imread(fileName, IMREAD_COLOR);
 
         green_img = isolate_green(img);
         red_img = isolate_red(img);
 
-        namedWindow("green", WINDOW_NORMAL);
-        imshow("green", green_img);
-
-        namedWindow("red", WINDOW_NORMAL);
-        imshow("red", red_img);
-
         detect_SS(green_img, SS_points);
         detect_SS(red_img, SS_points);
 
         rmv_SS(img, SS_points);
 
-        namedWindow("rmv", WINDOW_NORMAL);
-        imshow("rmv", img);
-
         cvtColor(img, img, cv::COLOR_BGR2GRAY);
+
+        std::cout << "test3" << std::endl;
 
         //perform_dilate(img);
 
-        namedWindow("dilate", WINDOW_NORMAL);
-        imshow("dilate", img);
-
         img = perform_skeletonization(img, 124);
 
-        namedWindow("skel", WINDOW_NORMAL);
-        imshow("skel", img);
-
-        cvtColor(img, output, COLOR_GRAY2BGR);
+        std::cout << "test4" << std::endl;
 
         // Detect the lines in img
-        lines = detect_lines(img, 3);
+        lines = detect_lines(img, 1);
 
-        cvtColor(img, temp_img, COLOR_GRAY2BGR);
+        std::cout << "test5" << std::endl;
 
-        for(size_t i = 0; i < lines.size()-1; i++){
-            line(temp_img, Point(lines[i][0], lines[i][1]), Point(lines[i][2], lines[i][3]), Scalar(0,0,255), 3, LINE_AA);
+        cvtColor(img, img, cv::COLOR_GRAY2BGR);
+        lines = sort(lines, SS_points, img);
+
+        Mat comp_img = img.clone();
+
+        for(size_t j = 0; j < lines.size(); j++){
+            line(comp_img, Point(lines[j][0], lines[j][1]), Point(lines[j][2], lines[j][3]), Scalar(0,0,255), 3, LINE_AA);
         }
 
-        namedWindow("lines", WINDOW_NORMAL);
-        imshow("lines", temp_img);
+        namedWindow("comp", WINDOW_NORMAL);
+        imshow("comp", comp_img);
 
-        lines = sort(lines, SS_points, temp_img);
+        std::cout << "test6" << std::endl;
 
-        cvtColor(img, temp_img, COLOR_GRAY2BGR);
+        while(1){
+            namedWindow("select", WINDOW_NORMAL);
 
-        circle(temp_img, Point(SS_points[0][0], SS_points[0][1]), 20, Scalar(0,100,0), -1);
+            setMouseCallback("select", onMouse, 0);
 
-        //avg_distance = calc_avg_distance(comp_path, temp_lines[i]);
+            imshow("select", img);
+
+            int key = waitKey(1);
+
+            if(key == 27){
+                break;
+            }
+        }
+
+        for(int j = 1; j < man_points.size(); j++){
+            if(j == 1){
+                man_lines.push_back(Vec4i(test_SS_Points[0].x, test_SS_Points[0].y, man_points[j-1].x, man_points[j-1].y));
+            }
+            else if(j == man_points.size() - 1){
+                man_lines.push_back(Vec4i(man_points[j].x, man_points[j].y, test_SS_Points[1].x, test_SS_Points[1].y));
+            }
+
+            man_lines.push_back(Vec4i(man_points[j-1].x, man_points[j-1].y, man_points[j].x, man_points[j].y));
+        }
+
+        avg_dist = calc_avg_distance(man_lines, lines);
+
+        if(outFile.is_open()){
+            outFile << avg_dist << endl;
+        }
+
+        man_points.clear();
+        man_lines.clear();
+        test_SS_Points.clear();
     }
 
     namedWindow("output", WINDOW_NORMAL);

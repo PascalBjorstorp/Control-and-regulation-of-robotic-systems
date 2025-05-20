@@ -1,0 +1,10 @@
+------ Cropped_board1 ------
+1.03766
+------ Cropped_board2 ------
+1.54039
+------ Cropped_board3 ------
+3.60807
+------ Cropped_board4 ------
+6.28975
+------ Cropped_board5 ------
+19.3865

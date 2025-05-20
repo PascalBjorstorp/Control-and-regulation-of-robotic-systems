@@ -1,4 +1,4 @@
-# Install script for directory: /home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu
+# Install script for directory: /home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,7 +39,7 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/usr/bin/objdump")
+  set(CMAKE_OBJDUMP "/usr/bin/llvm-objdump-16")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/mads-hyrup/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

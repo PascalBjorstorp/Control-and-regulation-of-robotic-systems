@@ -5,24 +5,25 @@
 		{
 			"compiler" : 
 			{
-				"id" : "GNU",
+				"id" : "Clang",
 				"implicit" : 
 				{
 					"includeDirectories" : 
 					[
-						"/usr/lib/gcc/x86_64-linux-gnu/11/include",
+						"/usr/lib/llvm-16/lib/clang/16/include",
 						"/usr/local/include",
 						"/usr/include/x86_64-linux-gnu",
 						"/usr/include"
 					],
 					"linkDirectories" : 
 					[
-						"/usr/lib/gcc/x86_64-linux-gnu/11",
-						"/usr/x86_64-linux-gnu/lib",
-						"/usr/lib/x86_64-linux-gnu",
-						"/usr/lib",
+						"/usr/lib/gcc/x86_64-linux-gnu/14",
+						"/usr/lib64",
 						"/lib/x86_64-linux-gnu",
-						"/lib"
+						"/lib64",
+						"/usr/lib/x86_64-linux-gnu",
+						"/lib",
+						"/usr/lib"
 					],
 					"linkFrameworkDirectories" : [],
 					"linkLibraries" : 
@@ -34,8 +35,8 @@
 						"gcc_s"
 					]
 				},
-				"path" : "/usr/bin/gcc",
-				"version" : "11.4.0"
+				"path" : "/usr/bin/clang-16",
+				"version" : "16.0.6"
 			},
 			"language" : "C",
 			"sourceFileExtensions" : 
@@ -47,27 +48,28 @@
 		{
 			"compiler" : 
 			{
-				"id" : "GNU",
+				"id" : "Clang",
 				"implicit" : 
 				{
 					"includeDirectories" : 
 					[
-						"/usr/include/c++/11",
-						"/usr/include/x86_64-linux-gnu/c++/11",
-						"/usr/include/c++/11/backward",
-						"/usr/lib/gcc/x86_64-linux-gnu/11/include",
+						"/usr/include/c++/14",
+						"/usr/include/x86_64-linux-gnu/c++/14",
+						"/usr/include/c++/14/backward",
+						"/usr/lib/llvm-16/lib/clang/16/include",
 						"/usr/local/include",
 						"/usr/include/x86_64-linux-gnu",
 						"/usr/include"
 					],
 					"linkDirectories" : 
 					[
-						"/usr/lib/gcc/x86_64-linux-gnu/11",
-						"/usr/x86_64-linux-gnu/lib",
-						"/usr/lib/x86_64-linux-gnu",
-						"/usr/lib",
+						"/usr/lib/gcc/x86_64-linux-gnu/14",
+						"/usr/lib64",
 						"/lib/x86_64-linux-gnu",
-						"/lib"
+						"/lib64",
+						"/usr/lib/x86_64-linux-gnu",
+						"/lib",
+						"/usr/lib"
 					],
 					"linkFrameworkDirectories" : [],
 					"linkLibraries" : 
@@ -81,8 +83,8 @@
 						"gcc"
 					]
 				},
-				"path" : "/usr/bin/g++",
-				"version" : "11.4.0"
+				"path" : "/usr/bin/clang++-16",
+				"version" : "16.0.6"
 			},
 			"language" : "CXX",
 			"sourceFileExtensions" : 
@@ -97,7 +99,10 @@
 				"mpp",
 				"CPP",
 				"ixx",
-				"cppm"
+				"cppm",
+				"ccm",
+				"cxxm",
+				"c++m"
 			]
 		}
 	],
