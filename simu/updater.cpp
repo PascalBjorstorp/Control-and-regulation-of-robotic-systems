@@ -46,16 +46,25 @@ Updater::~Updater() {
 // ...existing code...
 
 void Updater::update(){
+
+    float tiltX, tiltY;
+    sf::CircleShape ballShape;
+    sf::ConvexShape mazeBackground;
+    sf::VertexArray pathPoints;
+    std::vector<sf::CircleShape> waypointMarkers;
+    std::vector<Wall> walls;
+    sf::CircleShape targetMarker;
+    sf::Vector2f ballCenter;
+    sf::Vector2f targetPos;
+    std::vector<Point3D> waypoints;
+
     while (_window.isOpen()) {
-        float tiltX, tiltY;
-        sf::CircleShape ballShape;
-        sf::ConvexShape mazeBackground;
-        sf::VertexArray pathPoints;
-        std::vector<sf::CircleShape> waypointMarkers;
-        std::vector<Wall> walls;
-        sf::CircleShape targetMarker;
-        sf::Vector2f ballCenter;
-        sf::Vector2f targetPos;
+
+        sf::Event event;
+        while (_window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                _window.close();
+        }
 
         {
             std::unique_lock<std::mutex> lock(dataMutex);
@@ -68,20 +77,19 @@ void Updater::update(){
             targetMarker = _maze.getTargetMarker();
             ballShape = _ball.getShape();
 
-            // Get ball center
-            ballCenter = ballShape.getPosition() + sf::Vector2f(ballShape.getRadius(), ballShape.getRadius());
-
             // Get current waypoint as target (in pixels)
-            std::vector<Point3D> waypoints = _maze.getPathWaypoints();
-            if (!waypoints.empty()) {
-                if (waypointIdx >= waypoints.size()) waypointIdx = waypoints.size() - 1;
-                targetPos = waypoints[waypointIdx].project();
-            } else {
-                targetPos = ballCenter;
-            }
+            waypoints = _maze.getPathWaypoints();
         }
 
-        // ...event handling and debug info...
+        // Get ball center
+        ballCenter = ballShape.getPosition() + sf::Vector2f(ballShape.getRadius(), ballShape.getRadius());
+
+        if (!waypoints.empty()) {
+            if (waypointIdx >= waypoints.size()) waypointIdx = waypoints.size() - 1;
+            targetPos = waypoints[waypointIdx].project();
+        } else {
+            targetPos = ballCenter;
+        }
 
         _window.clear(sf::Color::White);
 
@@ -106,32 +114,13 @@ void Updater::update(){
         arrow[1].color = sf::Color::Red;
         _window.draw(arrow);
 
-        // Optionally, draw an arrowhead
-        sf::Vector2f dir = targetPos - ballCenter;
-        float length = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-        if (length > 1e-3) {
-            dir /= length;
-            sf::Vector2f perp(-dir.y, dir.x);
-            float arrowHeadSize = 15.f;
-            sf::Vector2f p1 = targetPos - dir * arrowHeadSize + perp * (arrowHeadSize / 2);
-            sf::Vector2f p2 = targetPos - dir * arrowHeadSize - perp * (arrowHeadSize / 2);
-
-            sf::VertexArray arrowHead(sf::Triangles, 3);
-            arrowHead[0].position = targetPos;
-            arrowHead[0].color = sf::Color::Red;
-            arrowHead[1].position = p1;
-            arrowHead[1].color = sf::Color::Red;
-            arrowHead[2].position = p2;
-            arrowHead[2].color = sf::Color::Red;
-            _window.draw(arrowHead);
-        }
-
         _window.display();
     }
 }
 
 void Updater::physicsUpdate() {
     auto prevTime = std::chrono::steady_clock::now();
+    float constValue = (5/7) * Constants::GRAVITY * 1000.0f; // m/s^2
     while (running) {
         float tiltX, tiltY, ballX_mm, ballY_mm;
         bool hasNewData = false;
@@ -146,9 +135,6 @@ void Updater::physicsUpdate() {
                 ballY_mm = receivedBallY;
                 newDataAvailable = false;
                 hasNewData = true;
-            } else {
-                ballX_mm = ballPosX_mm;
-                ballY_mm = ballPosY_mm;
             }
         }
 
@@ -162,11 +148,11 @@ void Updater::physicsUpdate() {
             ballPosY_mm = ballY_mm;
         } else {
             // Convert tilt to radians to calculate acceleration
-            float ax = (5/7) * Constants::GRAVITY * std::sin(tiltX * M_PI / 180.0f); // m/s^2
-            float ay = (5/7) * Constants::GRAVITY * std::sin(tiltY * M_PI / 180.0f);
+            float ax = constValue * std::sin(tiltX * M_PI / 180.0f); // m/s^2
+            float ay = constValue * std::sin(tiltY * M_PI / 180.0f);
 
-            ballVelX += ax * dt * 1000.0f;
-            ballVelY += ay * dt * 1000.0f;
+            ballVelX += ax * dt;
+            ballVelY += ay * dt;
 
             ballPosX_mm += ballVelX * dt;
             ballPosY_mm += ballVelY * dt;
@@ -184,7 +170,7 @@ void Updater::physicsUpdate() {
             _ball.update(tiltX, tiltY);
         }
         //std::cout << "Ball Position: " << ballX << ", " << ballY << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 }
 
@@ -262,7 +248,12 @@ void Updater::sendAngle() {
     float integralX = 0.0f;
     float integralY = 0.0f;
 
+    auto prevTime = std::chrono::steady_clock::now();
+
     while (running) {
+        auto now = std::chrono::steady_clock::now();
+        float dt = std::chrono::duration_cast<std::chrono::milliseconds>(now - prevTime).count() / 1000.0f;
+        prevTime = now;
         {
             std::unique_lock<std::mutex> lock(dataMutex);
 
@@ -274,9 +265,10 @@ void Updater::sendAngle() {
 
             // Get current waypoint as target (in mm)
             std::vector<Point3D> waypoints = _maze.getPathWaypoints();
-            if (waypoints.empty()) continue;
 
             lock.unlock();
+
+            if (waypoints.empty()) continue;
 
             // Project waypoint to 2D and convert to mm if needed
             sf::Vector2f targetPos = waypoints[waypointIdx].project();
@@ -288,8 +280,8 @@ void Updater::sendAngle() {
             float errorX = targetX - ballPosX;
             float errorY = targetY - ballPosY;
 
-            float derivativeX = (errorX - prev_errorX) / 0.1f; // dt = 0.1s
-            float derivativeY = (errorY - prev_errorY) / 0.1f;
+            float derivativeX = (errorX - prev_errorX) / dt; // dt = 0.1s
+            float derivativeY = (errorY - prev_errorY) / dt;
 
             prev_errorX = errorX;
             prev_errorY = errorY;
@@ -301,11 +293,13 @@ void Updater::sendAngle() {
             if (distance < 3.0f && waypointIdx < waypoints.size() - 1) {
                 waypointIdx++;
                 continue;
+            } else if (distance < 3.0f) {
+                waypointIdx = 0; // Reset to first waypoint
             }
             lock.unlock();
 
-            integralX += errorX * 0.05;
-            integralY += errorY * 0.05;
+            integralX += errorX * dt;
+            integralY += errorY * dt;
 
             // PD control for tilt (board coordinates)
             float tiltX = kp * errorX + ki * integralX + kd * ballVelY_local;
