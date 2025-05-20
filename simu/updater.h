@@ -30,6 +30,7 @@ class Updater
     UARTcom _uart;
     BallDetector _ballDetector{"/dev/video2"};
     std::ofstream logFile;
+    size_t waypointIdx = 0;
 
     // Thread variables
     std::thread angleRX;

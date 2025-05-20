@@ -78,15 +78,13 @@ void BallDetector::detectionLoop() {
             }
         
             // Draw a circle at the detected ball position
-            cv::Mat imgWithCircle = img.clone();
-            cv::circle(imgWithCircle, cv::Point(static_cast<int>(cx), static_cast<int>(cy)), 15, cv::Scalar(0, 0, 255), 2);
+            //cv::Mat imgWithCircle = img.clone();
+            //cv::circle(imgWithCircle, cv::Point(static_cast<int>(cx), static_cast<int>(cy)), 15, cv::Scalar(0, 0, 255), 2);
 
             // Show the image (for debugging)
-            cv::imshow("Ball Detection", imgWithCircle);
-            cv::waitKey(1); // Needed to update the window
+            //cv::imshow("Ball Detection", imgWithCircle);
+            //cv::waitKey(1); // Needed to update the window
         
-            // Optionally, save the image
-            // cv::imwrite("detected_ball.png", imgWithCircle);
         } else {
             std::lock_guard<std::mutex> lock(posMutex);
             hasBall = false;

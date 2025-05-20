@@ -18,9 +18,9 @@ class lineDetecter : public imageHandler
     std::vector<cv::Vec4i> _perps;
     std::vector<int> _perp_and_line_id;
     int _start_id = 0;
-    int _min_length = 30;
+    int _min_length = 110;
     int _perp_length = 30;
-    int _angle_limit = 5;
+    int _angle_limit = 10;
 
 public:
     explicit lineDetecter(cv::Mat img);

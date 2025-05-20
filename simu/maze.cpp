@@ -218,7 +218,7 @@ void Maze::makeTarget(){
     // Setup the target marker that the ball needs to reach
     // This is visualized as a green circle on the maze
     _targetMarker.setRadius(Constants::TARGET_RADIUS);
-    _targetMarker.setFillColor(sf::Color(100, 100, 255, 150)); // Semi-transparent blue
+    _targetMarker.setFillColor(sf::Color(100, 100, 100, 150)); // Semi-transparent blue
     _targetMarker.setOrigin(Constants::TARGET_RADIUS, Constants::TARGET_RADIUS);
 
     std::vector<cv::Point> points = get_inters();
@@ -309,7 +309,7 @@ void Maze::createPathVisuals() {
     for (auto& waypoint : _pathWaypoints) {
         sf::CircleShape marker;
         marker.setRadius(5.f);
-        marker.setFillColor(sf::Color(100, 100, 255, 150)); // Semi-transparent blue
+        marker.setFillColor(sf::Color(0, 255, 0, 150)); // Semi-transparent blue
         marker.setOrigin(5.f, 5.f);
         
         // Project to get screen position

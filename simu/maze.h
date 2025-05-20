@@ -145,7 +145,8 @@ public:
     float getTiltX() const { return _tiltX; }
     float getTiltY() const { return _tiltY; }
     const sf::VertexArray& getPath() const { return _pathPoints; }
-    const std::vector<sf::CircleShape>& getWaypointMarkers() const { return _waypointMarkers; }
+    std::vector<sf::CircleShape>& getWaypointMarkers() { return _waypointMarkers; }
+    std::vector<Point3D> getPathWaypoints() { return _pathWaypoints; }
 
     // Setter functions
     void setTiltX(float tiltX) { _tiltX = tiltX; }

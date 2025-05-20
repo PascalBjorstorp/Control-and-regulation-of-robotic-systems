@@ -384,7 +384,7 @@ void lineDetecter::sort(){
 
     flip();
 
-    eliminate_long_lines(700);
+    eliminate_long_lines(500);
 }
 
 int lineDetecter::calc_angle(const cv::Vec4i line1, const cv::Vec4i line2){

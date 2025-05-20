@@ -55,7 +55,6 @@ UARTcom::UARTcom() {
 }
 
 uint8_t UARTcom::convertFloatToMsg(int motorSelect, float value){
-    value = value + 64;
     uint8_t data = static_cast<uint8_t>(value);
 
     data &= 0x7F;  // Clear bit 8 to ensure it's not set
@@ -68,8 +67,12 @@ uint8_t UARTcom::convertFloatToMsg(int motorSelect, float value){
 }
 
 void UARTcom::sendmsg(int motorSelect, float inputNumber) {
-    uint8_t msg = convertFloatToMsg(motorSelect, inputNumber);                                         /* Her skriver vi vores besked til atmegaen */
+    uint8_t msg = convertFloatToMsg(motorSelect, inputNumber);                                         /* Her skriver vi vores besked  */
     write(_serial_port, &msg, sizeof(msg));
+
+    float angle = inputNumber;
+    std::string debugCunt = std::bitset<8>(msg).to_string();
+    //std::cout << motorSelect << ": " <<debugCunt << " Receive Angle: " << angle << std::endl;
 }
 
 /**
@@ -89,11 +92,8 @@ bool UARTcom::receivemsg(int& motorSelect, float& angle) {
     motorSelect = (msg & 0x80) ? 1 : 0; // MSB: 0 = motor 1, 1 = motor 2
 
     uint8_t value = msg & 0x7F; // 7 LSB
-    angle = (static_cast<float>(value) - 64.0f) / 4; // Convert to range [-64, 63]
-    //std::cout << "Motor: " << motorSelect << ", Angle: " << angle << std::endl;
-
-    std::string debugCunt = std::bitset<8>(msg).to_string();
-    std::cout << motorSelect << ": " <<debugCunt << " Receive Angle: " << angle << std::endl;
+    angle = (static_cast<float>(value) - 64.0f); // Convert to range [-64, 63]
+    //std::cout << "Receive Motor: " << motorSelect << ", Angle: " << angle << std::endl;
     return true;
 }
 
