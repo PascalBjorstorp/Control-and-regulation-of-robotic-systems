@@ -28,7 +28,7 @@ Mat isolate_green(const Mat img){
 
     cvtColor(img, hsv, cv::COLOR_BGR2HSV);
 
-    inRange(hsv, Scalar(35, 100, 50), Scalar(85, 255, 255), green_img);
+    inRange(hsv, Scalar(35, 100, 50), Scalar(85, 255, 255), green_img); // Correct green
     
     return green_img;
 }

@@ -23,46 +23,85 @@ using namespace cv;
 
 */
 
-/*--------- Testing Ideas -------------
-    Using skeletonization:
-    - Varrying threshold function lower limit (Upper should always be 255)
-    - Elimination of Hough lines shorter than x length
-        - Increasing minimum length of hough lines, while increasing amount of dilation - meaning more coherrency of lines
-    - Filling out gaps made after eliminating "too short" line segments
-        - Using bezier curve
-        - Finding intersecting lines, that deviate in angle, more than some value (ex. 15 degrees).
-            - Lines should be lengthened, such that they intersect.
-        ^(Each of the two above methods may have pros and cons, in terms of figures they best describe)
-            ^^Should be tested.
-*/
+Point calc_midpoint(const Vec4i& line) {
+    return Point((line[0] + line[2]) / 2, (line[1] + line[3]) / 2);
+}
 
-/* --------- Improvements ------------
-    - Since the camera will be moving with the pan-tilt system, meaning there will be no change in relative
-      position and angle, it is possible to record the change in position, of the center point of the ball, 
-      for each frame. Using the frame rate of the video stream it is possible to determine the amount of time between
-      each frame, meaning velocity for the ball can be calculated. The direction of the movement can also be calculated
-      by making a vector from the last recorded point to the new point. A ratio describing pixel to real world distance
-      is needed. It is also crucial that distortion in the video is decreased as much as possible.
-*/
+// Function to calculate the Euclidean distance between two points
+double calc_distance(const Point& p1, const Point& p2) {
+    return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
+}
 
-/* -------- Considerations ----------
-    - To find the start and end points of the "track", they should either be placed at specific
-    points (Top left and bottom right) or be marked with some form of marker (ex. colored dot)
-    - It is neccessary for the vector of lines to be sorted, such that each line comes in 
-    chronological order, in terms of the path/route the ball would travel. This is neccesary
-    such that waypoints/commands come in correct sequence.
-        - Might need to project the lines to be longer, to fill gaps from eliminated lines,
-        in order to sort the lines in chronological order.
-    
-    - While having end points in red and green, it is important to notice that red is within the 
-    threshold values (currently used), and it can therefore be detected by houghlineP, which is 
-    not ideal. We will therefore record the position of the start/stop points, and color them white
-    afterwards.
-*/
+double calc_segment_distance(const Vec4i& line1, const Vec4i& line2) {
+    Point p1(line1[0], line1[1]), q1(line1[2], line1[3]);
+    Point p2(line2[0], line2[1]), q2(line2[2], line2[3]);
+
+    // Helper function to calculate the squared distance between two points
+    auto dist2 = [](const Point& a, const Point& b) {
+        return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+    };
+
+    // Helper function to calculate the projection of point c onto line segment ab
+    auto point_to_segment_dist2 = [&](const Point& a, const Point& b, const Point& c) {
+        double l2 = dist2(a, b); // Length of segment squared
+        if (l2 == 0.0) return dist2(a, c); // a == b case
+        double t = ((c.x - a.x) * (b.x - a.x) + (c.y - a.y) * (b.y - a.y)) / l2;
+        t = max(0.0, min(1.0, t)); // Clamp t to [0, 1]
+        Point projection(a.x + t * (b.x - a.x), a.y + t * (b.y - a.y));
+        return dist2(c, projection);
+    };
+
+    // Calculate the minimum distance squared between the two line segments
+    double min_dist2 = min({
+        point_to_segment_dist2(p1, q1, p2),
+        point_to_segment_dist2(p1, q1, q2),
+        point_to_segment_dist2(p2, q2, p1),
+        point_to_segment_dist2(p2, q2, q1)
+    });
+
+    return sqrt(min_dist2); // Return the actual distance
+}
+
+double calc_avg_distance(const vector<Vec4i>& lines1, const vector<Vec4i>& lines2) {
+
+    double total_distance = 0.0;
+
+    for (const auto& line1 : lines1) {
+        // Find the closest line in lines2
+        double min_distance = DBL_MAX;
+        for (const auto& line2 : lines2) {
+            double distance = calc_segment_distance(line1, line2);
+            if (distance < min_distance) {
+                min_distance = distance;
+            }
+        }
+
+        // Add the minimum distance to the total
+        total_distance += min_distance;
+    }
+
+    // Calculate the average distance
+    return total_distance / lines1.size();
+}
+
+bool is_line_outside_scope(const Vec4i& line, const vector<Vec4i>& other_lines, double threshold) {
+    double min_distance = DBL_MAX;
+
+    // Calculate the minimum distance to any line in the other vector
+    for (const auto& other_line : other_lines) {
+        double distance = calc_segment_distance(line, other_line);
+        if (distance < min_distance) {
+            min_distance = distance;
+        }
+    }
+
+    // Check if the minimum distance is above the threshold
+    return min_distance > threshold;
+}
 
 int main(int argc, char** argv) 
 { 
-    Mat img = imread("/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/test_img_ended.jpg", IMREAD_COLOR); 
+    Mat img = imread("/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/TestPic/Cropped_board1.jpg", IMREAD_COLOR); 
 
     //Check if image was read properly.
     if (img.empty()) { 
@@ -70,95 +109,86 @@ int main(int argc, char** argv)
              << "Not Found" << endl; 
         cin.get(); 
         return -1; 
-    } 
-
-    //Display image after being read
-    namedWindow("Window1", WINDOW_GUI_NORMAL);
-    imshow("Window1", img);
-
-    // Initialize Mat types for making masks for blue and red - To find start and stop points
-    Mat green_img, blue_img, red_img, output;
+    }
 
     // Initialize vector which will hold "lines" - coordinates for start and end points.
     std::vector<Vec4i> lines;
 
-    // Read mask for red and blue colors into Mat type
-    red_img = isolate_red(img);
-    green_img = isolate_green(img);
-    blue_img = isolate_blue(img);
+    std::vector<Point> inters;
 
-    // Use hough circles algorithm to find coordinates for start and end points - save in SS_points
+    std::vector<Vec4i> comp_path;
+
+    // Initialize Mat types for making masks for blue and red - To find start and stop points
+    Mat green_img, blue_img, red_img, output, temp_img;
+
+    double avg_distance;
+
     std::vector<Vec3f> SS_points;
-    detect_SS(green_img, SS_points);
-    detect_SS(red_img, SS_points);
 
-    // Remove the start and stop identifiers from image (white out)
-    rmv_SS(img, SS_points);
+    for(int i = 1; i < 6; i++){
 
-    // Transform img to gray scale, changes amount of color channels for the Mat type
-    cvtColor(img, img, cv::COLOR_BGR2GRAY);
+        SS_points.clear();
+        lines.clear();
+        inters.clear();
 
-    // Perform skeletonization on the image
-    img = perform_skeletonization(img);
+        String id = "Cropped_board" + to_string(i); 
 
-    // Dilate the image afterwards - Reduces the amount of fragmented segments in the skeleton
-    perform_dilate(img);
+        String fileName = "/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/TestPic/" + id + ".jpg";
+        cout << "------ " << id << " ------" << endl;
 
-    cvtColor(img, output, COLOR_GRAY2BGR);
+        img = imread(fileName, IMREAD_COLOR);
 
-    // Detect the lines in img
-    lines = detect_lines(img);
+        green_img = isolate_green(img);
+        red_img = isolate_red(img);
 
-    // Sort the detected lines
-    lines = sort(lines, SS_points);
+        namedWindow("green", WINDOW_NORMAL);
+        imshow("green", green_img);
 
-    for(size_t i = 0; i < lines.size(); i++){
-        line(output, Point(lines[i][0], lines[i][1]), Point(lines[i][2], lines[i][3]), Scalar(0,0,255), 3, LINE_AA);
-    }
+        namedWindow("red", WINDOW_NORMAL);
+        imshow("red", red_img);
 
-    namedWindow("Window2", WINDOW_GUI_NORMAL);
-    imshow("Window2", output);
+        detect_SS(green_img, SS_points);
+        detect_SS(red_img, SS_points);
 
-    std::vector<Point> inters = find_inters(lines);
+        rmv_SS(img, SS_points);
 
-    std::vector<Vec4i> comp_path = handle_inters(lines, inters);
+        namedWindow("rmv", WINDOW_NORMAL);
+        imshow("rmv", img);
 
-    for(size_t i = 0; i < comp_path.size(); i++){
-        line(output, Point(comp_path[i][0], comp_path[i][1]), Point(comp_path[i][2], comp_path[i][3]), Scalar(0,0,255), 3, LINE_AA);
-    }
+        cvtColor(img, img, cv::COLOR_BGR2GRAY);
 
-    for(size_t i = 0; i < comp_path.size(); i++){
-        circle(output, Point(comp_path[i][0], comp_path[i][1]), 30, Scalar(0,255,0), -1);
+        //perform_dilate(img);
 
-        namedWindow("output", WINDOW_NORMAL);
-        imshow("output", output);
-        waitKey(0);
+        namedWindow("dilate", WINDOW_NORMAL);
+        imshow("dilate", img);
 
-        circle(output, Point(comp_path[i][2], comp_path[i][3]), 30, Scalar(0,0,255), -1);
+        img = perform_skeletonization(img, 124);
 
-        namedWindow("output", WINDOW_NORMAL);
-        imshow("output", output);
-        waitKey(0);
-    }
+        namedWindow("skel", WINDOW_NORMAL);
+        imshow("skel", img);
 
-    for(size_t i = 0; i < SS_points.size(); i++){
-        circle(output, Point(SS_points[i][0], SS_points[i][1]), 30, Scalar(255,255,0), -1);
-    }
+        cvtColor(img, output, COLOR_GRAY2BGR);
 
-    for(size_t i = 0; i < inters.size(); i++){
-        if(inters[i] == Point(-1,-1)){
-            continue;
+        // Detect the lines in img
+        lines = detect_lines(img, 3);
+
+        cvtColor(img, temp_img, COLOR_GRAY2BGR);
+
+        for(size_t i = 0; i < lines.size()-1; i++){
+            line(temp_img, Point(lines[i][0], lines[i][1]), Point(lines[i][2], lines[i][3]), Scalar(0,0,255), 3, LINE_AA);
         }
-        else{
-            circle(output, inters[i], 30, Scalar(255,0,0), -1);
-        }
+
+        namedWindow("lines", WINDOW_NORMAL);
+        imshow("lines", temp_img);
+
+        lines = sort(lines, SS_points, temp_img);
+
+        cvtColor(img, temp_img, COLOR_GRAY2BGR);
+
+        circle(temp_img, Point(SS_points[0][0], SS_points[0][1]), 20, Scalar(0,100,0), -1);
+
+        //avg_distance = calc_avg_distance(comp_path, temp_lines[i]);
     }
-
-    Vec4i templine;
-
-    templine = perp_line(lines[1], 50);
-
-    line(output, Point(templine[0], templine[1]), Point(templine[2], templine[3]), Scalar(255,0,0), 5);
 
     namedWindow("output", WINDOW_NORMAL);
     imshow("output", output);

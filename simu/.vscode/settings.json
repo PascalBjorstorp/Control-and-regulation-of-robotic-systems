@@ -83,6 +83,20 @@
         "numbers": "cpp",
         "semaphore": "cpp",
         "typeindex": "cpp",
+<<<<<<< Updated upstream
         "variant": "cpp"
+=======
+        "typeinfo": "cpp",
+        "valarray": "cpp",
+        "variant": "cpp",
+        "charconv": "cpp",
+        "source_location": "cpp",
+        "format": "cpp",
+        "span": "cpp",
+        "text_encoding": "cpp"
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     }
 }

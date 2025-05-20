@@ -18,21 +18,23 @@ int calc_dist(Point p1, Point p2);
 
 int find_start_line(std::vector<Vec4i> lines, std::vector<Vec3f> SS_points);
 
-std::vector<Vec4i> sort_lines(const std::vector<Vec4i> lines, const int start_id);
+std::vector<Vec4i> sort_lines(std::vector<Vec4i>& lines, std::vector<Vec3f> SS_points, double max_distance);
 
 int calc_line_len(const Vec4i line);
+
+std::vector<Vec4i> find_intersecting_lines(const Vec4i current_line, const std::vector<Vec4i> grouped_lines, Mat img, double extension_scale = 1.5);
 
 void eliminate_small_lines(std::vector<Vec4i>& line_Vec, int min_len);
 
 std::vector<Vec4i> eliminate_overlap(const std::vector<Vec4i> line_Vec);
 
-std::vector<Vec4i> detect_lines(const Mat img);
+std::vector<Vec4i> detect_lines(const Mat img, int min_len);
 
 Vec4i find_closest_pair(const Vec4i line1, const Vec4i line2);
 
 std::vector<Vec4i> conn_lines(const std::vector<Vec4i> lines, const std::vector<Vec3f> SS_points);
 
-std::vector<Vec4i> sort(const std::vector<Vec4i> lines, const std::vector<Vec3f> SS_points);
+std::vector<Vec4i> sort(const std::vector<Vec4i> lines, const std::vector<Vec3f> SS_points, Mat img);
 
 int calc_angle(const Vec4i line1, const Vec4i line2);
 
