@@ -46,17 +46,18 @@ Updater::~Updater() {
 // ...existing code...
 
 void Updater::update(){
+    float tiltX, tiltY;
+    sf::CircleShape ballShape;
+    sf::ConvexShape mazeBackground;
+    sf::VertexArray pathPoints;
+    std::vector<sf::CircleShape> waypointMarkers;
+    std::vector<Wall> walls;
+    sf::CircleShape targetMarker;
+    sf::Vector2f ballCenter;
+    sf::Vector2f targetPos;
+    std::vector<Point3D> waypoints;
+    
     while (_window.isOpen()) {
-        float tiltX, tiltY;
-        sf::CircleShape ballShape;
-        sf::ConvexShape mazeBackground;
-        sf::VertexArray pathPoints;
-        std::vector<sf::CircleShape> waypointMarkers;
-        std::vector<Wall> walls;
-        sf::CircleShape targetMarker;
-        sf::Vector2f ballCenter;
-        sf::Vector2f targetPos;
-
         {
             std::unique_lock<std::mutex> lock(dataMutex);
             tiltX = receivedTiltX;
@@ -72,13 +73,14 @@ void Updater::update(){
             ballCenter = ballShape.getPosition() + sf::Vector2f(ballShape.getRadius(), ballShape.getRadius());
 
             // Get current waypoint as target (in pixels)
-            std::vector<Point3D> waypoints = _maze.getPathWaypoints();
-            if (!waypoints.empty()) {
-                if (waypointIdx >= waypoints.size()) waypointIdx = waypoints.size() - 1;
-                targetPos = waypoints[waypointIdx].project();
-            } else {
-                targetPos = ballCenter;
-            }
+            waypoints = _maze.getPathWaypoints();
+        }
+
+        if (!waypoints.empty()) {
+            if (waypointIdx >= waypoints.size()) waypointIdx = waypoints.size() - 1;
+            targetPos = waypoints[waypointIdx].project();
+        } else {
+            targetPos = ballCenter;
         }
 
         // ...event handling and debug info...
@@ -106,7 +108,7 @@ void Updater::update(){
         arrow[1].color = sf::Color::Red;
         _window.draw(arrow);
 
-        // Optionally, draw an arrowhead
+        /*
         sf::Vector2f dir = targetPos - ballCenter;
         float length = std::sqrt(dir.x * dir.x + dir.y * dir.y);
         if (length > 1e-3) {
@@ -125,6 +127,7 @@ void Updater::update(){
             arrowHead[2].color = sf::Color::Red;
             _window.draw(arrowHead);
         }
+        */
 
         _window.display();
     }
@@ -132,6 +135,7 @@ void Updater::update(){
 
 void Updater::physicsUpdate() {
     auto prevTime = std::chrono::steady_clock::now();
+    const constValue = (5/7) * Constants::GRAVITY * 1000.0f; // m/s^2 to mm/s^2
     while (running) {
         float tiltX, tiltY, ballX_mm, ballY_mm;
         bool hasNewData = false;
@@ -142,13 +146,10 @@ void Updater::physicsUpdate() {
             tiltX = receivedTiltX;
             tiltY = receivedTiltY;
             if (newDataAvailable) {
-                ballX_mm = receivedBallX;
-                ballY_mm = receivedBallY;
+                ballPosX_mm = receivedBallX;
+                ballPosY_mm = receivedBallY;
                 newDataAvailable = false;
                 hasNewData = true;
-            } else {
-                ballX_mm = ballPosX_mm;
-                ballY_mm = ballPosY_mm;
             }
         }
 
@@ -157,16 +158,13 @@ void Updater::physicsUpdate() {
         float dt = std::chrono::duration_cast<std::chrono::milliseconds>(now - prevTime).count() / 1000.0f;
         prevTime = now;
 
-        if (hasNewData) {
-            ballPosX_mm = ballX_mm;
-            ballPosY_mm = ballY_mm;
-        } else {
+        if (!hasNewData) {
             // Convert tilt to radians to calculate acceleration
-            float ax = (5/7) * Constants::GRAVITY * std::sin(tiltX * M_PI / 180.0f); // m/s^2
-            float ay = (5/7) * Constants::GRAVITY * std::sin(tiltY * M_PI / 180.0f);
+            float ax = constValue * std::sin(tiltX * M_PI / 180.0f); // m/s^2
+            float ay = constValue * std::sin(tiltY * M_PI / 180.0f);
 
-            ballVelX += ax * dt * 1000.0f;
-            ballVelY += ay * dt * 1000.0f;
+            ballVelX += ax * dt;
+            ballVelY += ay * dt;
 
             ballPosX_mm += ballVelX * dt;
             ballPosY_mm += ballVelY * dt;
@@ -184,7 +182,7 @@ void Updater::physicsUpdate() {
             _ball.update(tiltX, tiltY);
         }
         //std::cout << "Ball Position: " << ballX << ", " << ballY << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 }
 
@@ -261,6 +259,7 @@ void Updater::sendAngle() {
     float prev_errorY = 0.0f;
     float integralX = 0.0f;
     float integralY = 0.0f;
+    auto prevTime = std::chrono::steady_clock::now();
 
     while (running) {
         {
@@ -269,14 +268,13 @@ void Updater::sendAngle() {
             // Use the latest camera-updated position and velocity (in mm)
             float ballPosX = receivedBallX;
             float ballPosY = receivedBallY;
-            float ballVelX_local = ballVelX;
-            float ballVelY_local = ballVelY;
 
             // Get current waypoint as target (in mm)
             std::vector<Point3D> waypoints = _maze.getPathWaypoints();
-            if (waypoints.empty()) continue;
 
             lock.unlock();
+
+            if (waypoints.empty()) continue;
 
             // Project waypoint to 2D and convert to mm if needed
             sf::Vector2f targetPos = waypoints[waypointIdx].project();
@@ -288,8 +286,12 @@ void Updater::sendAngle() {
             float errorX = targetX - ballPosX;
             float errorY = targetY - ballPosY;
 
-            float derivativeX = (errorX - prev_errorX) / 0.1f; // dt = 0.1s
-            float derivativeY = (errorY - prev_errorY) / 0.1f;
+            auto now = std::chrono::steady_clock::now();
+            float dt = std::chrono::duration_cast<std::chrono::milliseconds>(now - prevTime).count() / 1000.0f;
+            prevTime = now;
+
+            float derivativeX = (errorX - prev_errorX) / dt; // dt = 0.1s
+            float derivativeY = (errorY - prev_errorY) / dt;
 
             prev_errorX = errorX;
             prev_errorY = errorY;
@@ -304,12 +306,37 @@ void Updater::sendAngle() {
             }
             lock.unlock();
 
-            integralX += errorX * 0.05;
-            integralY += errorY * 0.05;
+            float distance = std::sqrt(errorX * errorX + errorY * errorY);
+
+            // Ball velocity (in mm/s)
+            float vx, vy;
+            {
+                std::unique_lock<std::mutex> lock(dataMutex);
+                vx = ballVelX;
+                vy = ballVelY;
+            }
+
+            // Check if moving toward the target and above threshold
+            float velocity_toward_target = (vx * errorX + vy * errorY) / (distance + 1e-6f); // projection
+            float speed = std::sqrt(vx * vx + vy * vy);
+            const float velocityThreshold = 5.0f; // mm/s, adjust as needed
+
+            if (velocity_toward_target > 0 && speed > velocityThreshold) {
+                // Moving toward target and fast enough: stop tilting
+                integralX = 0.0f;
+                integralY = 0.0f;
+                _uart.sendmsg(0, 64); // Neutral
+                _uart.sendmsg(1, 64);
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                continue;
+            }
+
+            integralX += errorX * dt;
+            integralY += errorY * dt;
 
             // PD control for tilt (board coordinates)
-            float tiltX = kp * errorX + ki * integralX + kd * ballVelY_local;
-            float tiltY = kp * errorY + ki * integralY + kd * ballVelX_local;
+            float tiltX = kp * errorX + kd * derivativeX;
+            float tiltY = kp * errorY + kd * derivativeY;
 
             //std::cout << "Error X: " << kp * errorX << ", Error Y: " << kp * errorY << std::endl;
             //std::cout << "IntegralX: " << ki * integralX << ", IntegralY: " << ki * integralY << std::endl;
@@ -325,8 +352,8 @@ void Updater::sendAngle() {
             //std::cout << "Motor Angle X: " << motorAngleX << ", Motor Angle Y: " << motorAngleY << std::endl;
 
             // Map to UART value (-64 to 63 mapped to 0-127)
-            int uartX = static_cast<int>(std::round(-motorAngleX + 64));
-            int uartY = static_cast<int>(std::round(-motorAngleY + 64));
+            int uartX = static_cast<int>(std::round(motorAngleX + 64));
+            int uartY = static_cast<int>(std::round(motorAngleY + 64));
             uartX = std::clamp(uartX, 0, 127);
             uartY = std::clamp(uartY, 0, 127);
 
