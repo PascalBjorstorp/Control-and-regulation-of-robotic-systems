@@ -1,0 +1,3 @@
+/home/mads-hyrup/Documents/Uni/4.Semester/simu/build/CMakeFiles/BallMazeGame.dir
+/home/mads-hyrup/Documents/Uni/4.Semester/simu/build/CMakeFiles/edit_cache.dir
+/home/mads-hyrup/Documents/Uni/4.Semester/simu/build/CMakeFiles/rebuild_cache.dir
