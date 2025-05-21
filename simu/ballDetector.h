@@ -16,7 +16,7 @@ private:
 
 public:
     std::atomic<bool> running{true};
-    BallDetector(const std::string& device = "/dev/video2");
+    BallDetector();
     void detectionLoop();
     bool getBallPosition(float& x, float& y);
     void outerPoints(const cv::Mat& img, int startRow, int startCol, int endRow, int endCol, std::vector<int>& locations);

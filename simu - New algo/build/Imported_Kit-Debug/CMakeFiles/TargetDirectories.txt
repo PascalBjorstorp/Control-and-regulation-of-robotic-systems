@@ -1,0 +1,3 @@
+/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu - New algo/build/Imported_Kit-Debug/CMakeFiles/BallMazeGame.dir
+/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu - New algo/build/Imported_Kit-Debug/CMakeFiles/edit_cache.dir
+/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu - New algo/build/Imported_Kit-Debug/CMakeFiles/rebuild_cache.dir

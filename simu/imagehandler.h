@@ -6,10 +6,12 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
+extern std::vector<cv::Vec3f> _SS_points;
+
 class imageHandler
 {
     cv::Mat _img, _red_img, _blue_img, _green_img;
-    int _threshhold = 127;
+    int _threshhold = 124;
 
 public:
     explicit imageHandler(cv::Mat img);

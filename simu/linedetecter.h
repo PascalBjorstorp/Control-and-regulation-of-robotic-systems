@@ -18,12 +18,38 @@ class lineDetecter : public imageHandler
     std::vector<cv::Vec4i> _perps;
     std::vector<int> _perp_and_line_id;
     int _start_id = 0;
-    int _min_length = 110;
-    int _perp_length = 30;
-    int _angle_limit = 10;
+    int _min_length = 40;
+    //int _perp_length = 30;
+    int _inter_min_dist = 200;
+    int _inter_line_min_dist = 100;
+    int _prox_dist = 200;
+    int _angle_limit = 15;
+    int _overlap_tolerance = 10;
 
 public:
     explicit lineDetecter(cv::Mat img);
+
+    cv::Vec4i orient(cv::Vec4i line, cv::Vec4i next_line);
+
+    std::pair<double, int> corner_check(const cv::Vec4i trgt_line, const std::vector<cv::Vec4i> lines);
+
+    std::vector<cv::Vec4i> find_intersecting_lines(const cv::Vec4i cur_line, const std::vector<cv::Vec4i> grouped_lines);
+
+    bool check_end(cv::Vec4i line, std::vector<cv::Vec3f> SS_points);
+
+    std::vector<cv::Vec4i> within_prox(cv::Vec4i line, std::vector<cv::Vec4i> lines, int prox_val);
+
+    std::pair<cv::Vec4i, double> ex_closest_line(cv::Vec4i cur_line, std::vector<cv::Vec4i> lines, double scale_val);
+
+    double closest_dist(cv::Vec4i line, std::vector<cv::Vec4i> lines);
+
+    cv::Vec4i closest_line(cv::Vec4i line, std::vector<cv::Vec4i> lines);
+
+    bool is_line_between(const cv::Vec4i line1, const cv::Vec4i line2, const cv::Vec4i candidate_line, std::vector<cv::Vec4i> lines, cv::Mat img, int tolerance);
+
+    cv::Vec4i find_line_between(const cv::Vec4i line1, const cv::Vec4i line2, const std::vector<cv::Vec4i> lines, cv::Mat img);
+
+    void rmv_SS();
 
     int calc_dist(cv::Point p1, cv::Point p2);
 
@@ -35,7 +61,7 @@ public:
 
     void eliminate_small_lines(int min_len);
 
-    bool detect_overlap(const cv::Vec4i line1, const cv::Vec4i line2);
+    bool detect_overlap(const cv::Vec4i line1, const cv::Vec4i line2, int tolerance);
 
     void eliminate_overlap();
 

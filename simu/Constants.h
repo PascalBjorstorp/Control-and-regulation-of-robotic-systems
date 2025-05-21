@@ -8,7 +8,7 @@ namespace Constants {
     inline constexpr int FOCAL_LENGTH = 500;
 
     // Ball settings
-    inline constexpr float BALL_RADIUS = 32.f;
+    inline constexpr float BALL_RADIUS = 64.f;
     inline constexpr float FRICTION = 1.f;
     inline constexpr float GRAVITY = 9.82f;
     inline constexpr float TIME_STEP = 0.030f;

@@ -2,7 +2,7 @@
 #include <limits>
 #include <algorithm>
 
-BallDetector::BallDetector(const std::string& device_) : device(device_) {
+BallDetector::BallDetector() {
     // Load homography from file
     cv::FileStorage fs("homography.yml", cv::FileStorage::READ);
     if (fs.isOpened()) {

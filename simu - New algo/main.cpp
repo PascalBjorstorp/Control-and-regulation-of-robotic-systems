@@ -16,7 +16,7 @@ int main() {
     // Create the updater object and start the main update loop
     //cv::Mat img2 = cv::imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/ForSimulation/test_img_ended.jpg", cv::IMREAD_COLOR);
 
-    cv::Mat img2 = cv::imread("/home/mads-hyrup/Documents/Uni/4.Semester/Cpp - Project/TestPic/Cropped_board1_test.jpg", cv::IMREAD_COLOR);
+    cv::Mat img2 = cv::imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/ForSimulation/test_img_ended.jpg", cv::IMREAD_COLOR);
 
     /*cv::VideoCapture cap(2);
     if (!cap.isOpened()) {

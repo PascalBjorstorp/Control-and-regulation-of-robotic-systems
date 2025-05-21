@@ -28,7 +28,7 @@ class Updater
     Ball _ball;
     Maze _maze;
     UARTcom _uart;
-    BallDetector _ballDetector{"/dev/video2"};
+    BallDetector _ballDetector;
     std::ofstream logFile;
     size_t waypointIdx = 0;
 
