@@ -399,3 +399,40 @@ void Updater::sendAngle() {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 }
+
+/*
+void Updater::sendAngle() {
+    const float maxTilt = 3.0f; // Max tilt in degrees
+    const float gearRatio = 3.0f;
+
+    while (running) {
+        // Read joystick input (assuming joystick 0, axes X and Y)
+        float joyX = 0.0f;
+        float joyY = 0.0f;
+        if (sf::Joystick::isConnected(0)) {
+            joyX = sf::Joystick::getAxisPosition(0, sf::Joystick::X) / 100.f; // [-1, 1]
+            joyY = sf::Joystick::getAxisPosition(0, sf::Joystick::Y) / 100.f; // [-1, 1]
+        }
+
+        // Map joystick input to tilt angles
+        float tiltX = std::clamp(joyX * maxTilt, -maxTilt, maxTilt);
+        float tiltY = std::clamp(joyY * maxTilt, -maxTilt, maxTilt);
+
+        // Convert to motor angles (apply gear ratio)
+        float motorAngleX = tiltX * gearRatio;
+        float motorAngleY = tiltY * gearRatio;
+
+        // Map to UART value (-64 to 63 mapped to 0-127)
+        int uartX = static_cast<int>(std::round(-motorAngleX + 64));
+        int uartY = static_cast<int>(std::round(-motorAngleY + 64));
+        uartX = std::clamp(uartX, 0, 127);
+        uartY = std::clamp(uartY, 0, 127);
+
+        // Send angles via UART
+        _uart.sendmsg(0, uartX);
+        _uart.sendmsg(1, uartY);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+}
+*/
