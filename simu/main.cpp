@@ -14,9 +14,9 @@ void onMouse(int event, int x, int y, int, void*) {
 
 int main() {
     // Create the updater object and start the main update loop
-    //cv::Mat img = cv::imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/Vision/ForSimulation/test_img_ended.jpg", cv::IMREAD_COLOR);
-
-    cv::VideoCapture cap(0);
+    cv::Mat img = cv::imread("/home/aksel/Documents/GitHub/Control-and-regulation-of-robotic-systems/simu/correctImg.jpg", cv::IMREAD_COLOR);
+/*
+    cv::VideoCapture cap(2);
     if (!cap.isOpened()) {
         std::cerr << "Could not open camera!" << std::endl;
         return -1;
@@ -25,12 +25,24 @@ int main() {
     // Capture the first frame for calibration
     cv::Mat img;
     cap >> img;
+
+    auto start = std::chrono::steady_clock::now();
+    int frames = 0;
+    while (frames < 10) {
+        cv::Mat img;
+        cap >> img;
+        frames++;
+    }
+    auto end = std::chrono::steady_clock::now();
+    double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.0;
+    std::cout << "Measured FPS: " << frames / seconds << std::endl;
+
     if (img.empty()) {
         std::cerr << "Failed to capture image from camera!" << std::endl;
         return -1;
     }
     cap.release();
-
+*/
     // Save the captured image for calibration
     cv::imwrite("calibration_image.jpg", img);
 

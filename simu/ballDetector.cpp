@@ -26,7 +26,10 @@ bool BallDetector::getBallPosition(float& x, float& y) {
 
 void BallDetector::detectionLoop() {
     cv::VideoCapture cap(2);
-    if (!cap.isOpened()) return;
+    if (!cap.isOpened()) {
+    std::cerr << "Could not open webcam for ballDetector!" << std::endl;
+    return;
+}
 
     cv::Mat img, blue_img;
     while (running) {
@@ -47,8 +50,19 @@ void BallDetector::detectionLoop() {
         cv::cvtColor(img, hsv, cv::COLOR_BGR2HSV);
         cv::inRange(hsv, cv::Scalar(100, 150, 50), cv::Scalar(140, 255, 255), blue_img);
 
+
+        // Red color in HSV wraps around, so we need two ranges
+/*        cv::Mat mask1, mask2;
+        cv::inRange(hsv, cv::Scalar(0, 120, 70), cv::Scalar(10, 255, 255), mask1);
+        cv::inRange(hsv, cv::Scalar(170, 120, 70), cv::Scalar(180, 255, 255), mask2);
+        cv::bitwise_or(mask1, mask2, blue_img);
+*/
+
         std::vector<int> locations1(4), locations2(4), locations3(4), locations4(4);
         int rows = img.rows, cols = img.cols;
+
+        cv::imshow("Ball Detection", img);
+        cv::waitKey(1); // Needed to update the window
 
         #pragma omp parallel sections
         {
@@ -78,16 +92,17 @@ void BallDetector::detectionLoop() {
             }
         
             // Draw a circle at the detected ball position
-            //cv::Mat imgWithCircle = img.clone();
-            //cv::circle(imgWithCircle, cv::Point(static_cast<int>(cx), static_cast<int>(cy)), 15, cv::Scalar(0, 0, 255), 2);
+            cv::Mat imgWithCircle = img.clone();
+            cv::circle(imgWithCircle, cv::Point(static_cast<int>(cx), static_cast<int>(cy)), 15, cv::Scalar(0, 0, 255), 2);
 
             // Show the image (for debugging)
-            //cv::imshow("Ball Detection", imgWithCircle);
-            //cv::waitKey(1); // Needed to update the window
+            cv::imshow("Ball Detection", imgWithCircle);
+            cv::waitKey(1); // Needed to update the window
         
         } else {
             std::lock_guard<std::mutex> lock(posMutex);
             hasBall = false;
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
 }

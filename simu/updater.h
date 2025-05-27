@@ -38,6 +38,7 @@ class Updater
     std::thread angleTX;
     std::thread physicsThread;
     std::thread ballDetect;
+    std::thread tiltUpdateThread;
 
     // Mutex for thread-safe access to shared variables
     std::atomic<bool> running{true};
@@ -45,7 +46,15 @@ class Updater
     float receivedTiltX = 0.0f, receivedTiltY = 0.0f;
     float receivedBallX = 0.0f, receivedBallY = 0.0f;
     float ballVelX = 0.0f, ballVelY = 0.0f;
-    float ballPosX_mm = 0.0f, ballPosY_mm = 0.0f;
+    float ballPosX_mm = 100.0f, ballPosY_mm = 100.0f;
+    float tiltSetpointX = 0.0f;
+    float tiltSetpointY = 0.0f;
+    float currentTiltX = 0.0f;
+    float currentTiltY = 0.0f;
+
+    const float riseTimeMs = 450.0f;
+    const float updatePeriodMs = 1.0f;
+    const float steps = riseTimeMs / updatePeriodMs;
 
     // Effectively a flag to indicate new data is available
     std::condition_variable dataCondVar;
@@ -77,6 +86,8 @@ public:
     void angleUpdate();
     void cameraUpdate();
     void sendAngle();
+    void updateTiltTowardsSetpoint();
+    void tiltUpdateLoop() ;
 };
 
 #endif // UPDATER_H
